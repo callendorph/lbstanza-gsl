@@ -1,0 +1,36 @@
+#use-added-syntax(tests)
+defpackage gsl/ElementaryFuncs/tests :
+  import core
+  import gsl/ElementaryFuncs
+
+; Used for testing floating point numbers to check
+;   for "equality"
+val epsilon = 1.0e-3
+#if-defined(TESTING) :
+  defn almost-equal (obs, exp, epsilon:Double) -> True|False :
+    abs(obs - exp) < epsilon
+
+
+deftest gsl-elementary-test :
+  val testVecs = [
+    [{gsl-log1p(1.5)}, 0.9162],
+    [{gsl-expm1(0.2)}, 0.2214],
+    [{gsl-hypot(3.0,4.0)}, 5.0]
+    [{gsl-hypot3(3.0,4.0,5.0)}, 7.071]
+    [{gsl-acosh(1.5)}, 0.962],
+    [{gsl-asinh(0.5)}, 0.481],
+    [{gsl-atanh(0.5)}, 0.549],
+  ]
+
+  for testVec in testVecs do :
+    val [f, expVal] = testVec
+    val obsVal = f()
+    #EXPECT(almost-equal(expVal,obsVal, epsilon))
+
+  val obsNan = gsl-acosh(0.5)
+
+  #EXPECT(gsl-isnan(obsNan) == true)
+  #EXPECT(gsl-isnan(1.0) == false)
+
+  #EXPECT(gsl-finite(obsNan) == false)
+  #EXPECT(gsl-finite(-1.0) == true)

@@ -1,0 +1,56 @@
+defpackage gsl/ElementaryFuncs :
+  import core
+
+extern gsl_isnan : double -> int
+extern gsl_isinf : double -> int
+extern gsl_finite : double -> int
+
+extern gsl_log1p : double -> double
+extern gsl_expm1 : double -> double
+extern gsl_hypot : (double, double) -> double
+extern gsl_hypot3 : (double, double, double) -> double
+extern gsl_acosh : double -> double
+extern gsl_asinh : double -> double
+extern gsl_atanh : double -> double
+
+public lostanza defn gsl-isnan (x:ref<Double>) -> ref<True|False> :
+  val result = call-c gsl_isnan(x.value)
+  if result == 1 : return true
+  else: return false
+
+public lostanza defn gsl-isinf (x:ref<Double>) -> ref<Int> :
+  val result = call-c gsl_isinf(x.value)
+  return new Int{result}
+
+public lostanza defn gsl-finite (x:ref<Double>) -> ref<True|False> :
+  val result = call-c gsl_finite(x.value)
+  if result == 1 : return new True{}
+  else: return new False{}
+
+public lostanza defn gsl-log1p (x:ref<Double>) -> ref<Double> :
+  val result = call-c gsl_log1p(x.value)
+  return new Double{result}
+
+public lostanza defn gsl-expm1 (x:ref<Double>) -> ref<Double> :
+  val result = call-c gsl_expm1(x.value)
+  return new Double{result}
+
+public lostanza defn gsl-hypot (x:ref<Double>, y:ref<Double>) -> ref<Double> :
+  val result = call-c gsl_hypot(x.value, y.value)
+  return new Double{result}
+
+public lostanza defn gsl-hypot3 (x:ref<Double>, y:ref<Double>, z:ref<Double>) -> ref<Double> :
+  val result = call-c gsl_hypot3(x.value, y.value, z.value)
+  return new Double{result}
+
+public lostanza defn gsl-acosh (x:ref<Double>) -> ref<Double> :
+  val result = call-c gsl_acosh(x.value)
+  return new Double{result}
+
+public lostanza defn gsl-asinh (x:ref<Double>) -> ref<Double> :
+  val result = call-c gsl_asinh(x.value)
+  return new Double{result}
+
+public lostanza defn gsl-atanh (x:ref<Double>) -> ref<Double> :
+  val result = call-c gsl_atanh(x.value)
+  return new Double{result}
