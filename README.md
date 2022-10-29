@@ -21,7 +21,25 @@ Initial target functionality will be:
 
 # How to Build
 
-**TODO**
+Current build is very manual:
+
+1.  Download the [GSL v2.7 implementation](https://gnu.askapache.com/gsl/)
+2.  Untar the GSL library into `./gsl-orig/gsl-2.7`. You will find the README for GSL in `gsl-orig/gsl-2.7/README`
+3.  Do standard build in GSL `./configure`, `make`, and optionally `make install`.
+    1.  Note - On windows - I had to use cygwin to run the build. Unfortunately, windows doesn't support symlinks so the default build is difficult to use directly. I had to run `make install` and then copy the contents of the `/usr/local/include/gsl` directory back into the `./gsl-orig/gsl-2.7/gsl` directory over the existing symlink files to get this to work properly.
+4.  With that in place and a working `stanza` and `gcc` implementation on the path, you can run `./stanza.exe build gsl-tests` to build unit tests.
+
+```
+PS C:\tmp\gsl> stanza.exe build gsl-tests
+PS C:\tmp\gsl> ./gsl-tests
+[Test 1] gsl-elementary-test
+[PASS]
+
+Tests Finished: 1/1 tests passed. 0 tests skipped. 0 tests failed.
+
+Longest Running Tests:
+[PASS] gsl-elementary-test (3634 us)
+```
 
 # How to Use
 
