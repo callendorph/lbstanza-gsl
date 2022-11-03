@@ -1,5 +1,12 @@
 packages gsl/* defined-in "src/"
 
+package gsl/Errors requires :
+  ccfiles :
+    "{GSL_LIBDIR}/libgsl.a"
+    "{GSL_LIBDIR}/libgslcblas.a"
+  ccflags :
+    "-I{GSL_INCDIR}"
+
 package gsl/ElementaryFuncs requires :
   ccfiles :
     "{GSL_LIBDIR}/libgsl.a"
@@ -8,14 +15,17 @@ package gsl/ElementaryFuncs requires :
     "-I{GSL_INCDIR}"
 
 package gsl/ElementaryFuncs/tests defined-in "tests/ELementaryFuncs_tests.stanza"
+package gsl/Errors/tests defined-in "tests/Errors_tests.stanza"
 
 build main :
   inputs:
+    gsl/Errors
     gsl/ElementaryFuncs
   pkg: "pkgs"
 
 build-test gsl-tests :
   inputs:
     gsl/ElementaryFuncs/tests
+    gsl/Errors/tests
   pkg: "pkgs"
     o: "gsl-tests.exe"

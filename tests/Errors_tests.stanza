@@ -1,0 +1,24 @@
+#use-added-syntax(tests)
+defpackage gsl/Errors/tests :
+  import core
+  import gsl/Errors
+
+deftest gsl-errors-test :
+  val msg = gsl-strerror(gsl-ENOMEM())
+  val msgLen = length(msg)
+
+  #EXPECT(index-of-chars(msg, "malloc failed") != false)
+
+deftest gsl-exception-test :
+
+  var hasThrown = true
+  try:
+    throw(GSLException(gsl-ENOMEM()))
+    hasThrown = false
+  catch (e:GSLException):
+    val msg = to-string("%~" % [e])
+    #EXPECT(prefix?(msg, "GSL Error"))
+    #EXPECT(index-of-chars(msg, "Error[8]") != false)
+    #EXPECT(index-of-chars(msg, ": malloc failed") != false)
+
+  #EXPECT(hasThrown == true)

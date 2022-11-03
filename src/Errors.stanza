@@ -1,0 +1,21 @@
+defpackage gsl/Errors :
+  import core
+
+extern gsl_strerror : int -> ptr<byte>
+
+public lostanza defn gsl-strerror (code:ref<Int>) -> ref<String> :
+  val msg:ptr<byte> = call-c gsl_strerror(code.value)
+  return String(msg)
+
+public lostanza defn gsl-ENOMEM () -> ref<Int> :
+  ; This is a hack - I don't know how to make
+  ;  lostanza reference an enum value defined in a header.
+  return new Int{8}
+
+public defstruct GSLException <: Exception :
+  code:Int
+
+defmethod print (o:OutputStream, e:GSLException) :
+  val c = code(e)
+  print(o, "GSL Error[%_]: %_" % [c, gsl-strerror(c)])
+
