@@ -1,0 +1,59 @@
+#use-added-syntax(tests)
+defpackage gsl/GVector/tests :
+  import core
+  import gsl/GVector
+
+
+deftest gsl-gvector-basics :
+  val uut = GVector(3)
+
+  uut[0] = 10.0
+  uut[1] = -1.0
+  uut[2] = 0.0
+
+  var obs = uut[0]
+  #EXPECT(obs == 10.0)
+
+  obs = uut[1]
+  #EXPECT(obs == -1.0)
+
+  obs = uut[2]
+  #EXPECT(obs == 0.0)
+
+  set-all(uut, 5.0)
+  #EXPECT(uut[0] == 5.0)
+  #EXPECT(uut[1] == 5.0)
+  #EXPECT(uut[2] == 5.0)
+
+  set-zero(uut)
+  #EXPECT(uut[0] == 0.0)
+  #EXPECT(uut[1] == 0.0)
+  #EXPECT(uut[2] == 0.0)
+
+  set-basis(uut, 2)
+  #EXPECT(uut[0] == 0.0)
+  #EXPECT(uut[1] == 0.0)
+  #EXPECT(uut[2] == 1.0)
+
+deftest gsl-gvector-copy :
+  val uut = GVector(3)
+
+  set-basis(uut, 1)
+  #EXPECT(uut[0] == 0.0)
+  #EXPECT(uut[1] == 1.0)
+  #EXPECT(uut[2] == 0.0)
+
+  val uut2 = GVector(uut)
+
+  #EXPECT(uut2[0] == 0.0)
+  #EXPECT(uut2[1] == 1.0)
+  #EXPECT(uut2[2] == 0.0)
+
+  set-all(uut2, 10.0)
+  #EXPECT(uut2[0] == 10.0)
+  #EXPECT(uut2[1] == 10.0)
+  #EXPECT(uut2[2] == 10.0)
+
+  #EXPECT(uut[0] == 0.0)
+  #EXPECT(uut[1] == 1.0)
+  #EXPECT(uut[2] == 0.0)
