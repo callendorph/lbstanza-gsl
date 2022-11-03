@@ -14,18 +14,29 @@ package gsl/ElementaryFuncs requires :
   ccflags :
     "-I{GSL_INCDIR}"
 
+package gsl/GVector requires :
+  ccfiles:
+    "{GSL_LIBDIR}/libgsl.a"
+    "{GSL_LIBDIR}/libgslcblas.a"
+  ccflags :
+    "-I{GSL_INCDIR}"
+
+
 package gsl/ElementaryFuncs/tests defined-in "tests/ELementaryFuncs_tests.stanza"
+package gsl/GVector/tests defined-in "tests/GVector_tests.stanza"
 package gsl/Errors/tests defined-in "tests/Errors_tests.stanza"
 
 build main :
   inputs:
     gsl/Errors
     gsl/ElementaryFuncs
+    gsl/GVector
   pkg: "pkgs"
 
 build-test gsl-tests :
   inputs:
     gsl/ElementaryFuncs/tests
+    gsl/GVector/tests
     gsl/Errors/tests
   pkg: "pkgs"
     o: "gsl-tests.exe"

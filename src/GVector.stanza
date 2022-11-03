@@ -1,0 +1,70 @@
+defpackage gsl/GVector :
+  import core
+  import gsl/Errors
+
+extern gsl_vector_alloc : int -> ptr<?>
+extern gsl_vector_free : ptr<?> -> int
+extern gsl_vector_get : (ptr<?>, int) -> double
+extern gsl_vector_set : (ptr<?>, int, double) -> int ; void
+extern gsl_vector_set_all : (ptr<?>, double) -> int ; void
+extern gsl_vector_set_zero : (ptr<?>) -> int ; void
+extern gsl_vector_set_basis : (ptr<?>, int) -> int
+extern gsl_vector_memcpy : (ptr<?>, ptr<?>) -> int  ; dest, src -> ret code
+extern gsl_vector_swap : (ptr<?>, ptr<?>) -> int
+
+
+lostanza deftype GVectorFinalizer <: Finalizer :
+  value:ptr<?>
+
+lostanza defmethod run (v:ref<GVectorFinalizer>) -> ref<False> :
+  call-c gsl_vector_free(v.value)
+  return false
+
+public lostanza deftype GVector <: Unique :
+  value:ptr<?>
+  size:int
+
+public lostanza defn GVector (size:ref<Int>) -> ref<GVector> :
+  val ptr = call-c gsl_vector_alloc(size.value)
+  val null = 0L as ptr<?>
+  if ptr == null :
+    throw(GSLException(gsl-ENOMEM()))
+  val ret = new GVector{ptr,size.value}
+  add-finalizer(new GVectorFinalizer{ptr}, ret)
+  return ret
+
+public lostanza defn GVector (other:ref<GVector>) -> ref<GVector> :
+  ; Copy Constructor
+  val ret = GVector(new Int{other.size})
+  val result = call-c gsl_vector_memcpy(ret.value, other.value)
+  if result != 0 :
+    throw(GSLException(new Int{result}))
+  return ret
+
+public lostanza defn get (self:ref<GVector>, index:ref<Int>) -> ref<Double> :
+  val ret = call-c gsl_vector_get(self.value, index.value)
+  return new Double{ret}
+
+; I want to have the ability to get/set vectors with
+; ranges. There is the concept of a "view" vector for slices like this
+;   but it seems to use the stack - I'm not sure how that would work in
+;   stanza.
+; Perhaps the `within` scoped area is where to use this ?
+; public lostanza defn get(self:ref<GVector>, r:Range) -> ref<GVector>
+;   return new GVector{ptr}
+
+public lostanza defn set (self:ref<GVector>, index:ref<Int>, x:ref<Double>) -> ref<False> :
+  call-c gsl_vector_set(self.value, index.value, x.value)
+  return false
+
+public lostanza defn set-all (self:ref<GVector>, x:ref<Double>) -> ref<False> :
+  call-c gsl_vector_set_all(self.value, x.value)
+  return false
+
+public lostanza defn set-zero (self:ref<GVector>) -> ref<False> :
+  call-c gsl_vector_set_zero(self.value)
+  return false
+
+public lostanza defn set-basis (self:ref<GVector>, index:ref<Int>) -> ref<False> :
+  call-c gsl_vector_set_basis(self.value, index.value)
+  return false
