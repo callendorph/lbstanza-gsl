@@ -25,8 +25,13 @@ Current build is very manual:
 
 1.  Download the [GSL v2.7 implementation](https://gnu.askapache.com/gsl/)
 2.  Untar the GSL library into `./gsl-orig/gsl-2.7`. You will find the README for GSL in `gsl-orig/gsl-2.7/README`
-3.  Do standard build in GSL `./configure`, `make`, and optionally `make install`.
-    1.  Note - On windows - I had to use cygwin to run the build. Unfortunately, windows doesn't support symlinks so the default build is difficult to use directly. I had to run `make install` and then copy the contents of the `/usr/local/include/gsl` directory back into the `./gsl-orig/gsl-2.7/gsl` directory over the existing symlink files to get this to work properly.
+3.  Do standard build in GSL `./configure`, `make`, and `make install`.
+    1.  Note - On windows - I had to use cygwin to run the build.
+    2.  You will want to make sure you use the same gcc version here as will be used for your stanza build later.
+4.  Set environment variables to tell the `stanza` build system where to find the gsl libraries and headers.
+    1.  Set `GSL_INCDIR` to the directory where the `gsl` headers are found.
+    2.  Set `GSL_LIBDIR` to the directory where the `gsl` libraries `libgsl.a`, etc are found.
+    3.  The `start.sh` script locally will define these in bash to the default `prefix` locations for the gsl build, ie `/usr/local/include/gsl` and `/usr/local/lib`, respectively.
 4.  With that in place and a working `stanza` and `gcc` implementation on the path, you can run `./stanza.exe build gsl-tests` to build unit tests.
 
 ```
