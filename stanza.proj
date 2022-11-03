@@ -2,14 +2,10 @@ packages gsl/* defined-in "src/"
 
 package gsl/ElementaryFuncs requires :
   ccfiles :
-    "{GSL_DIR}/sys/log1p.c"
-    "{GSL_DIR}/sys/expm1.c"
-    "{GSL_DIR}/sys/infnan.c"
-    "{GSL_DIR}/sys/invhyp.c"
-    "{GSL_DIR}/sys/hypot.c"
-    "{GSL_DIR}/sys/fdiv.c"
+    "{GSL_LIBDIR}/libgsl.a"
+    "{GSL_LIBDIR}/libgslcblas.a"
   ccflags :
-    "-I{GSL_DIR}"
+    "-I{GSL_INCDIR}"
 
 package gsl/ElementaryFuncs/tests defined-in "tests/ELementaryFuncs_tests.stanza"
 
