@@ -36,14 +36,40 @@ Current build is very manual:
 
 ```
 PS C:\tmp\gsl> stanza.exe build gsl-tests
-PS C:\tmp\gsl> ./gsl-tests
+PS C:\tmp\gsl> ./gsl-tests -not-tagged fatal
 [Test 1] gsl-elementary-test
 [PASS]
 
-Tests Finished: 1/1 tests passed. 0 tests skipped. 0 tests failed.
+[Test 2] gsl-gvector-basics
+[PASS]
+
+[Test 3] gsl-gvector-copy
+[PASS]
+
+[Test 4] gsl-errors-test
+[PASS]
+
+[Test 5] gsl-exception-test
+[PASS]
+
+[Test 7] gsl-error-handler-reset-test [SKIPPED]
+
+[Test 7] gsl-error-handler-test
+[PASS]
+
+[Test 9] gsl-std-error-handler-test [SKIPPED]
+
+Tests Finished: 6/8 tests passed. 2 tests skipped. 0 tests failed.
 
 Longest Running Tests:
-[PASS] gsl-elementary-test (3634 us)
+[PASS] gsl-elementary-test (895 us)
+[PASS] gsl-gvector-basics (460 us)
+[PASS] gsl-gvector-copy (408 us)
+[PASS] gsl-errors-test (302 us)
+[PASS] gsl-exception-test (240 us)
+[PASS] gsl-error-handler-test (119 us)
+[SKIPPED] gsl-error-handler-reset-test
+[SKIPPED] gsl-std-error-handler-test
 ```
 
 # How to Use
