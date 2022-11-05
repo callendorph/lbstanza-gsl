@@ -19,3 +19,85 @@ defmethod print (o:OutputStream, e:GSLException) :
   val c = code(e)
   print(o, "GSL Error[%_]: %_" % [c, gsl-strerror(c)])
 
+
+; Error Handler Callback
+
+; In C - the Handler is of the form:
+;  void handler (const char * reason,
+;              const char * file,
+;              int line,
+;              int gsl_errno)
+;
+; The Set handler accepts a pointer to a handler function and then returns the
+;  previously set pointer to a handler function.
+;extern gsl_set_error_handler : ptr<((ptr<byte>, ptr<byte>, int, int) -> int)> -> ptr<((ptr<byte>, ptr<byte>, int, int) -> int)>
+;extern gsl_set_error_handler_off : () -> ptr<((ptr<byte>, ptr<byte>, int, int) -> int)>
+
+extern gsl_set_error_handler : ptr<?> -> ptr<?>
+extern gsl_set_error_handler_off : () -> ptr<?>
+
+
+; User must implement a sub-type of `GSLErrorHandler`
+;  and then implement the `on-error` method to receive the callbacks
+;  from gsl library.
+public deftype GSLErrorHandler
+
+public defmulti on-error (self:GSLErrorHandler, reason:String, file:String, line:Int, code:Int) -> Int
+
+public defmethod on-error (self:GSLErrorHandler, reason:String, file:String, line:Int, code:Int) -> Int :
+  ; Default implementation that is just a null handler
+  0
+
+val nullHandler = new GSLErrorHandler
+; Local Variable that holds the handler that will receive
+;   the error callbacks from gsl.
+var localHandler = nullHandler
+; Local Variable that holds the returned pointer when
+;  we call `gsl_set_error_handler`.
+lostanza var oldHandler:ptr<?> = null
+
+
+extern defn error_handler_wrapper (msg:ptr<byte>, file:ptr<byte>, line:int, code:int) -> int :
+  ; This function is called directly by GSL. This is an interposer of sorts that
+  ;  will correctly allow us to redirect these messages to our GSLErrorHandler object.
+  on-error(localHandler, String(msg), String(file), new Int{line}, new Int{code})
+  return 0
+
+lostanza defn setup-local-handler () -> ref<False>:
+  oldHandler = call-c gsl_set_error_handler(addr(error_handler_wrapper))
+  return false
+
+public defn set-error-handler (handler:GSLErrorHandler):
+  localHandler = handler
+  setup-local-handler()
+
+public lostanza defn local-reset-error-handler () -> ref<False> :
+  if oldHandler != null :
+    call-c gsl_set_error_handler(oldHandler)
+    oldHandler = null
+
+  return false
+
+public defn reset-error-handler () :
+  local-reset-error-handler()
+  localHandler = nullHandler
+
+public lostanza defn set-error-handler-off () -> ref<False>:
+  if oldHandler != null :
+    fatal("Cannot Call 'set-error-handler-off' until 'reset-error-handler' is called.")
+  oldHandler = call-c gsl_set_error_handler_off()
+  return false
+
+; This is a standard implementation of the error handler
+;   for stanza that will generate some string output information
+;   for the error and then call fatal to create a stack trace.
+public deftype GSLStdErrorHandler <: GSLErrorHandler
+
+public defn GSLStdErrorHandler () -> GSLStdErrorHandler :
+  new GSLStdErrorHandler :
+    defmethod on-error (this, reason:String, file:String, line:Int, code:Int) -> Int :
+      val buf = StringBuffer()
+      println(buf, "GSL Error[%_]: %_" % [code, reason])
+      println(buf, "Loc: %_:%_" % [file, line])
+      fatal(to-string(buf))
+      0

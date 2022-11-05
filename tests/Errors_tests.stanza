@@ -2,6 +2,8 @@
 defpackage gsl/Errors/tests :
   import core
   import gsl/Errors
+  import gsl/ElementaryFuncs
+  import gsl/GVector
 
 deftest gsl-errors-test :
   val msg = gsl-strerror(gsl-ENOMEM())
@@ -22,3 +24,88 @@ deftest gsl-exception-test :
     #EXPECT(index-of-chars(msg, ": malloc failed") != false)
 
   #EXPECT(hasThrown == true)
+
+public deftype TestErrHandler <: GSLErrorHandler
+public defmulti get-buf (self:TestErrHandler) -> List
+
+public defn TestErrHandler () -> TestErrHandler :
+  var buf = List()
+  new TestErrHandler :
+    defmethod get-buf (this) -> List :
+      buf
+    defmethod on-error (this, reason:String, file:String, line:Int, code:Int) -> Int :
+      buf = cons([reason, file, line, code], buf)
+      0
+
+; @NOTE This test will cause an abort - so can't really be
+;   run in the full suite.
+deftest(fatal) gsl-error-handler-reset-test :
+  set-error-handler-off()
+
+  val uut = GVector(3)
+
+  ; This should trigger output via the error handler
+  var asdf = uut[10]
+  #EXPECT(false == false)
+  reset-error-handler()
+  ; This next command should call default error handler
+  ; and abort.
+  asdf = uut[10]
+  #EXPECT(false == false)
+
+deftest gsl-error-handler-test :
+  val handler = TestErrHandler()
+  set-error-handler(handler)
+
+  val uut = GVector(3)
+
+  ; This should trigger output via the error handler
+  var asdf = uut[10]
+
+  val buf = get-buf(handler)
+  #EXPECT(length(buf) == 1)
+  val msg = buf[0]
+  #EXPECT(length(buf) == 1)
+  val [reason, file, line, code] = head(buf)
+  #EXPECT(index-of-chars(reason, "out of range") != false)
+  #EXPECT(index-of-chars(file, "vector") != false)
+  #EXPECT(line > 0)
+  #EXPECT(code == 4)
+
+  ; Reset the error handler and we should not get any traffic
+  ;  to the buffer.
+  reset-error-handler()
+
+  ; Set the handler again
+  set-error-handler(handler)
+
+  asdf = uut[10]
+  #EXPECT(length(get-buf(handler)) == 2)
+
+  reset-error-handler()
+
+  ; Set the error handler output to off -
+  ;   and then try again - the list should not change.
+  set-error-handler-off()
+
+  ; This should not trigger output via the error handler
+  asdf = uut[10]
+  #EXPECT(length(get-buf(handler)) == 2)
+
+  ; This should reset things back to the original state.
+  ;  Still no messages though
+  reset-error-handler()
+
+  asdf = uut[10]
+
+deftest(fatal) gsl-std-error-handler-test :
+  ; This Test calls fatal - so we should not run it as part of the
+  ;  standard unit test suite.
+  val handler = GSLStdErrorHandler()
+  set-error-handler(handler)
+
+  val uut = GVector(3)
+
+  ; This should trigger output via the error handler
+  var asdf = uut[10]
+  #EXPECT(false == false)
