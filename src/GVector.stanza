@@ -1,5 +1,6 @@
 defpackage gsl/GVector :
   import core
+  import collections
   import gsl/Errors
 
 extern gsl_vector_alloc : int -> ptr<?>
@@ -12,6 +13,21 @@ extern gsl_vector_set_basis : (ptr<?>, int) -> int
 extern gsl_vector_memcpy : (ptr<?>, ptr<?>) -> int  ; dest, src -> ret code
 extern gsl_vector_swap : (ptr<?>, ptr<?>) -> int
 
+extern gsl_vector_add : (ptr<?>, ptr<?>) -> int
+extern gsl_vector_add_constant : (ptr<?>, double) -> int
+extern gsl_vector_sub : (ptr<?>, ptr<?>) -> int
+extern gsl_vector_mul : (ptr<?>, ptr<?>) -> int
+extern gsl_vector_div : (ptr<?>, ptr<?>) -> int
+extern gsl_vector_scale : (ptr<?>, double) -> int
+extern gsl_vector_sum : (ptr<?>) -> double
+extern gsl_vector_axpby : (double, ptr<?>, double, ptr<?>) -> int
+
+extern gsl_vector_max : (ptr<?>) -> double
+extern gsl_vector_min : (ptr<?>) -> double
+extern gsl_vector_minmax : (ptr<?>, ptr<?>, ptr<?>) -> int
+extern gsl_vector_max_index : (ptr<?>) -> int
+extern gsl_vector_min_index : (ptr<?>) -> int
+extern gsl_vector_minmax_index : (ptr<?>, ptr<int>, ptr<int>) -> int
 
 lostanza deftype GVectorFinalizer <: Finalizer :
   value:ptr<?>
@@ -68,3 +84,197 @@ public lostanza defn set-zero (self:ref<GVector>) -> ref<False> :
 public lostanza defn set-basis (self:ref<GVector>, index:ref<Int>) -> ref<False> :
   call-c gsl_vector_set_basis(self.value, index.value)
   return false
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Operators
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+public lostanza defn gsl-vector-add (A:ref<GVector>, B:ref<GVector>) -> ref<Int> :
+  val code = call-c gsl_vector_add(A.value, B.value)
+  return new Int{code}
+
+public defn plus! (A:GVector, B:GVector) :
+  val code = gsl-vector-add(A, B)
+  if code != 0 :
+    throw(GSLException(code))
+
+public defn plus (A:GVector, B:GVector) -> GVector :
+  val ret = GVector(A)
+  plus!(ret, B)
+  ret
+
+public lostanza defn gsl-vector-add-constant (A:ref<GVector>, B:ref<Double>) -> ref<Int> :
+  val code = call-c gsl_vector_add_constant(A.value, B.value)
+  return new Int{code}
+
+public defn plus! (A:GVector, B:Double) :
+  val code = gsl-vector-add-constant(A, B)
+  if code != 0 :
+    throw(GSLException(code))
+
+public defn plus (A:GVector, B:Double) -> GVector :
+  val ret = GVector(A)
+  plus!(ret, B)
+  ret
+
+public defn plus (B:Double, A:GVector) -> GVector :
+  A + B
+
+public lostanza defn gsl-vector-sub (A:ref<GVector>, B:ref<GVector>) -> ref<Int> :
+  val code = call-c gsl_vector_sub(A.value, B.value)
+  return new Int{code}
+
+public defn minus! (A:GVector, B:GVector) :
+  val code = gsl-vector-sub(A, B)
+  if code != 0 :
+    throw(GSLException(code))
+
+public defn minus (A:GVector, B:GVector) -> GVector :
+  val ret = GVector(A)
+  minus!(ret, B)
+  ret
+
+public defn minus (A:GVector, B:Double) -> GVector :
+  A + (- B)
+
+public defn minus! (A:GVector, B:Double) :
+  plus!(A, (- B))
+
+public lostanza defn gsl-vector-mul (A:ref<GVector>, B:ref<GVector>) -> ref<Int> :
+  val code = call-c gsl_vector_mul(A.value, B.value)
+  return new Int{code}
+
+public lostanza defn gsl-vector-scale (A:ref<GVector>, B:ref<Double>) -> ref<Int> :
+  val code = call-c gsl_vector_scale(A.value, B.value)
+  return new Int{code}
+
+public defn times! (A:GVector, B:GVector) :
+  val code = gsl-vector-mul(A, B)
+  if code != 0 :
+    throw(GSLException(code))
+
+public defn times (A:GVector, B:GVector) -> GVector :
+  val ret = GVector(A)
+  times!(ret, B)
+  ret
+
+public defn times! (A:GVector, B:Double) :
+  val code = gsl-vector-scale(A, B)
+  if code != 0 :
+    throw(GSLException(code))
+
+public defn times (A:GVector, B:Double) -> GVector :
+  val ret = GVector(A)
+  times!(ret, B)
+  ret
+
+public defn times (B:Double, A:GVector) -> GVector :
+  A * B
+
+public defn negate (A:GVector) -> GVector :
+  A * (- 1.0)
+
+public lostanza defn gsl-vector-div (A:ref<GVector>, B:ref<GVector>) -> ref<Int> :
+  val code = call-c gsl_vector_div(A.value, B.value)
+  return new Int{code}
+
+public defn divide! (A:GVector, B:GVector) :
+  val code = gsl-vector-div(A, B)
+  if code != 0 :
+    throw(GSLException(code))
+
+public defn divide (A:GVector, B:GVector) -> GVector :
+  val ret = GVector(A)
+  divide!(ret, B)
+  ret
+
+public defn divide! (A:GVector, B:Double) :
+  val code = gsl-vector-scale(A, 1.0 / B)
+  if code != 0 :
+    throw(GSLException(code))
+
+public defn divide (A:GVector, B:Double) -> GVector :
+  val ret = GVector(A)
+  divide!(ret, B)
+  ret
+
+public lostanza defn gsl-vector-sum (A:ref<GVector>) -> ref<Double> :
+  val ret = call-c gsl_vector_sum(A.value)
+  return new Double{ret}
+
+public defn sum (A:GVector) -> Double :
+  gsl-vector-sum(A)
+
+public lostanza defn gsl-vector-axpby (a:ref<Double>, X:ref<GVector>, b:ref<Double>, Y:ref<GVector>) -> ref<Int> :
+  val code = call-c gsl_vector_axpby(a.value, X.value, b.value, Y.value)
+  return new Int{code}
+
+public defn axpby! (a:Double, X:GVector, b:Double, Y:GVector) :
+  ; Result in Y
+  val code = gsl-vector-axpby(a, X, b, Y)
+  if code != 0 :
+    throw(GSLException(code))
+
+public defn axpby (a:Double, X:GVector, b:Double, Y:GVector) -> GVector :
+  val ret = GVector(Y)
+  axpby!(a,X,b,ret)
+  ret
+
+; Min Max Functions
+public lostanza defn gsl-vector-max (A:ref<GVector>) -> ref<Double> :
+  val ret = call-c gsl_vector_max(A.value)
+  return new Double{ret}
+
+public lostanza defn gsl-vector-min (A:ref<GVector>) -> ref<Double> :
+  val ret = call-c gsl_vector_min(A.value)
+  return new Double{ret}
+
+public defn maximum (A:GVector) -> Double :
+  gsl-vector-max(A)
+
+public defn minimum (A:GVector) -> Double :
+  gsl-vector-min(A)
+
+lostanza deftype GVMinMaxDouble:
+  var minV:double
+  var maxV:double
+
+public lostanza defn gsl-vector-minmax (A:ref<GVector>) -> ref<[Double, Double]> :
+  val mm = new GVMinMaxDouble{0.0, 0.0}
+  call-c gsl_vector_minmax(A.value, addr!(mm.minV), addr!(mm.maxV))
+  val ret = core/void-tuple(2)
+  ret.items[0] = new Double{mm.minV}
+  ret.items[1] = new Double{mm.maxV}
+  return ret as ref<[Double, Double]>
+
+public defn minmax (A:GVector) -> [Double, Double] :
+  gsl-vector-minmax(A)
+
+public lostanza defn gsl-vector-max-index (A:ref<GVector>) -> ref<Int> :
+  val ret = call-c gsl_vector_max_index(A.value)
+  return new Int{ret}
+
+public defn argmax (A:GVector) -> Int :
+  gsl-vector-max-index(A)
+
+public lostanza defn gsl-vector-min-index (A:ref<GVector>) -> ref<Int> :
+  val ret = call-c gsl_vector_min_index(A.value)
+  return new Int{ret}
+
+public defn argmin (A:GVector) -> Int :
+  gsl-vector-min-index(A)
+
+lostanza deftype GVMinMaxInt:
+  var minV:int
+  var maxV:int
+
+public lostanza defn gsl-vector-minmax-index (A:ref<GVector>) -> ref<[Int,Int]> :
+  val mm = new GVMinMaxInt{-1, -1}
+  call-c gsl_vector_minmax_index(A.value, addr!(mm.minV), addr!(mm.maxV))
+  val ret = core/void-tuple(2)
+  ret.items[0] = new Int{mm.minV}
+  ret.items[1] = new Int{mm.maxV}
+  return ret as ref<[Int, Int]>
+
+public defn argminmax (A:GVector) -> [Int, Int] :
+  gsl-vector-minmax-index(A)

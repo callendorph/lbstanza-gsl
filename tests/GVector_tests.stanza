@@ -57,3 +57,224 @@ deftest gsl-gvector-copy :
   #EXPECT(uut[0] == 0.0)
   #EXPECT(uut[1] == 1.0)
   #EXPECT(uut[2] == 0.0)
+
+deftest gsl-plus-vector-operator :
+  val A = GVector(3)
+  set-basis(A, 0)
+  val B = GVector(3)
+  set-basis(B, 1)
+
+  val C = A + B
+  #EXPECT(C[0] == 1.0)
+  #EXPECT(C[1] == 1.0)
+  #EXPECT(C[2] == 0.0)
+
+deftest gsl-plus!-vector-operator :
+  val A = GVector(3)
+  set-basis(A, 0)
+  val B = GVector(3)
+  set-basis(B, 1)
+
+  plus!(A, B)
+
+  #EXPECT(A[0] == 1.0)
+  #EXPECT(A[1] == 1.0)
+  #EXPECT(A[2] == 0.0)
+
+deftest gsl-plus-double-operator :
+  val A = GVector(3)
+  set-basis(A, 0)
+  val B = 2.0
+
+  val C = A + B
+  #EXPECT(C[0] == 3.0)
+  #EXPECT(C[1] == 2.0)
+  #EXPECT(C[2] == 2.0)
+
+  val D = B + A
+  #EXPECT(D[0] == 3.0)
+  #EXPECT(D[1] == 2.0)
+  #EXPECT(D[2] == 2.0)
+
+deftest gsl-minus!-vector-operator :
+  val A = GVector(4)
+  set-all(A, 10.0)
+
+  val B = GVector(4)
+  set-basis(B, 1)
+
+  minus!(A,B)
+  #EXPECT(A[0] == 10.0)
+  #EXPECT(A[1] == 9.0)
+  #EXPECT(A[2] == 10.0)
+  #EXPECT(A[3] == 10.0)
+
+deftest gsl-minus-vector-operator :
+  val A = GVector(4)
+  set-all(A, 10.0)
+
+  val B = GVector(4)
+  set-all(B, 5.0)
+
+  val C = A - B
+  #EXPECT(C[0] == 5.0)
+  #EXPECT(C[1] == 5.0)
+  #EXPECT(C[2] == 5.0)
+  #EXPECT(C[3] == 5.0)
+
+
+deftest gsl-minus-double-operator :
+  val A = GVector(4)
+  set-basis(A, 3)
+
+  val B = 0.5
+
+  val C = A - B
+  #EXPECT(C[0] == -0.5)
+  #EXPECT(C[1] == -0.5)
+  #EXPECT(C[2] == -0.5)
+  #EXPECT(C[3] == 0.5)
+
+  minus!(C, 1.0)
+  #EXPECT(C[0] == -1.5)
+  #EXPECT(C[1] == -1.5)
+  #EXPECT(C[2] == -1.5)
+  #EXPECT(C[3] == -0.5)
+
+deftest gsl-times-vector-operator :
+  val A = GVector(3)
+  set-basis(A, 1)
+
+  val B = GVector(3)
+  set-all(B, 5.0)
+
+  val C = A * B
+  #EXPECT(C[0] == 0.0)
+  #EXPECT(C[1] == 5.0)
+  #EXPECT(C[2] == 0.0)
+
+  times!(B, C)
+  #EXPECT(B[0] == 0.0)
+  #EXPECT(B[1] == 25.0)
+  #EXPECT(B[2] == 0.0)
+
+deftest gsl-times-double-operator :
+  val A = GVector(3)
+  set-basis(A, 2)
+
+  val B = 0.1
+
+  val C = A * B
+
+  #EXPECT(C[0] == 0.0)
+  #EXPECT(C[1] == 0.0)
+  #EXPECT(C[2] == 0.1)
+
+deftest gsl-divide-vector-operator :
+  val A = GVector(3)
+  set-all(A, 10.0)
+
+  val B = GVector(3)
+  set-all(B, 5.0)
+
+  val C = A / B
+  #EXPECT(C[0] == 2.0)
+  #EXPECT(C[1] == 2.0)
+  #EXPECT(C[2] == 2.0)
+
+deftest gsl-divide-double-operator :
+  val A = GVector(3)
+  set-all(A, 10.0)
+
+  val B = -2.0
+
+  val C = A / B
+  #EXPECT(C[0] == -5.0)
+  #EXPECT(C[1] == -5.0)
+  #EXPECT(C[2] == -5.0)
+
+
+deftest gsl-sum-vector-operator :
+  val A = GVector(10)
+  set-all(A, 2.0)
+
+  val B = sum(A)
+  #EXPECT(B == 20.0)
+
+deftest gsl-axpby-vector-operator :
+  val A = GVector(3)
+  set-all(A, 2.0)
+
+  val B = GVector(3)
+  set-basis(B, 1)
+
+  val C = axpby(-1.0, A, 0.5, B)
+  #EXPECT(C[0] == -2.0)
+  #EXPECT(C[1] == -1.5)
+  #EXPECT(C[2] == -2.0)
+
+deftest gsl-max-vector-operator :
+  val A = GVector(3)
+  set-basis(A, 1)
+
+  var B = maximum(A)
+  #EXPECT(B == 1.0)
+
+  A[2] = 5.0
+
+  B = maximum(A)
+  #EXPECT(B == 5.0)
+
+deftest gsl-min-vector-operator :
+  val A = GVector(3)
+  set-all(A, 1.0)
+  A[1] = 0.5
+
+  var B = minimum(A)
+  #EXPECT(B == 0.5)
+
+  times!(A, -1.0)
+
+  B = minimum(A)
+  #EXPECT(B == -1.0)
+
+deftest gsl-minmax-vector-operator :
+  val A = GVector(3)
+  set-all(A, 1.0)
+  A[1] = 0.5
+  A[2] = -1.0
+
+  val [minV, maxV] = minmax(A)
+
+  #EXPECT(minV == -1.0)
+  #EXPECT(maxV == 1.0)
+
+deftest gsl-argmax-vector-operator :
+  val A = GVector(3)
+  set-all(A, -1.0)
+  A[1] = 0.5
+  A[2] = 1.0
+
+  val ret = argmax(A)
+  #EXPECT(ret == 2)
+
+deftest gsl-argmin-vector-operator :
+  val A = GVector(3)
+  set-all(A, -1.0)
+  A[1] = -5.5
+  A[2] = 1.0
+
+  val ret = argmin(A)
+  #EXPECT(ret == 1)
+
+
+deftest gsl-argminmax-vector-operator :
+  val A = GVector(3)
+  set-all(A, -1.0)
+  A[1] = -5.5
+  A[2] = 1.0
+
+  val [minIndex, maxIndex] = argminmax(A)
+  #EXPECT(minIndex == 1)
+  #EXPECT(maxIndex == 2)
+
