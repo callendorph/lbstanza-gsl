@@ -21,22 +21,34 @@ package gsl/GVector requires :
   ccflags :
     "-I{GSL_INCDIR}"
 
+package gsl/GComplex requires :
+  ccfiles:
+    "src/GComplex.c"
+    "{GSL_LIBDIR}/libgsl.a"
+    "{GSL_LIBDIR}/libgslcblas.a"
+  ccflags :
+    "-I{GSL_INCDIR}"
+    "-DGSL_COMPLEX_LEGACY"
+
 
 package gsl/ElementaryFuncs/tests defined-in "tests/ELementaryFuncs_tests.stanza"
 package gsl/GVector/tests defined-in "tests/GVector_tests.stanza"
 package gsl/Errors/tests defined-in "tests/Errors_tests.stanza"
+package gsl/GComplex/tests defined-in "tests/GComplex_tests.stanza"
 
 build main :
   inputs:
     gsl/Errors
     gsl/ElementaryFuncs
     gsl/GVector
+    gsl/GComplex
   pkg: "pkgs"
 
 build-test gsl-tests :
   inputs:
     gsl/ElementaryFuncs/tests
     gsl/GVector/tests
+    gsl/GComplex/tests
     gsl/Errors/tests
   pkg: "pkgs"
     o: "gsl-tests.exe"

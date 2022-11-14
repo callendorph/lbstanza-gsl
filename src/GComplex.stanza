@@ -1,0 +1,484 @@
+defpackage gsl/GComplex :
+  import core
+  import gsl/Errors
+
+
+public lostanza deftype GComplex :
+  x: double
+  y: double
+
+extern w_gsl_complex_rect : (ptr<?>, double, double) -> int
+extern w_gsl_complex_polar : (ptr<?>, double, double) -> int
+extern w_gsl_complex_real : (ptr<?>) -> double
+extern w_gsl_complex_imag : (ptr<?>) -> double
+extern w_gsl_complex_arg : (ptr<?>) -> double
+extern w_gsl_complex_abs : (ptr<?>) -> double
+extern w_gsl_complex_abs2 : (ptr<?>) -> double
+extern w_gsl_complex_logabs : (ptr<?>) -> double
+extern w_gsl_complex_add : (ptr<?>, ptr<?>, ptr<?>) -> int
+extern w_gsl_complex_sub : (ptr<?>, ptr<?>, ptr<?>) -> int
+extern w_gsl_complex_mul : (ptr<?>, ptr<?>, ptr<?>) -> int
+extern w_gsl_complex_div : (ptr<?>, ptr<?>, ptr<?>) -> int
+
+extern w_gsl_complex_add_real : (ptr<?>, double, ptr<?>) -> int
+extern w_gsl_complex_sub_real : (ptr<?>, double, ptr<?>) -> int
+extern w_gsl_complex_mul_real : (ptr<?>, double, ptr<?>) -> int
+extern w_gsl_complex_div_real : (ptr<?>, double, ptr<?>) -> int
+
+extern w_gsl_complex_add_imag : (ptr<?>, double, ptr<?>) -> int
+extern w_gsl_complex_sub_imag : (ptr<?>, double, ptr<?>) -> int
+extern w_gsl_complex_mul_imag : (ptr<?>, double, ptr<?>) -> int
+extern w_gsl_complex_div_imag : (ptr<?>, double, ptr<?>) -> int
+
+extern w_gsl_complex_inverse : (ptr<?>, ptr<?>) -> int
+extern w_gsl_complex_negative : (ptr<?>, ptr<?>) -> int
+
+extern w_gsl_complex_sqrt : (ptr<?>, ptr<?>) -> int
+extern w_gsl_complex_sqrt_real : (double, ptr<?>) -> int
+
+extern w_gsl_complex_pow : (ptr<?>, ptr<?>, ptr<?>) -> int
+extern w_gsl_complex_pow_real : (ptr<?>, double, ptr<?>) -> int
+extern w_gsl_complex_exp : (ptr<?>, ptr<?>) -> int
+extern w_gsl_complex_log : (ptr<?>, ptr<?>) -> int
+extern w_gsl_complex_log10 : (ptr<?>, ptr<?>) -> int
+extern w_gsl_complex_log_b : (ptr<?>, ptr<?>, ptr<?>) -> int
+
+extern w_gsl_complex_sin : (ptr<?>, ptr<?>) -> int
+extern w_gsl_complex_cos : (ptr<?>, ptr<?>) -> int
+extern w_gsl_complex_tan : (ptr<?>, ptr<?>) -> int
+extern w_gsl_complex_sec : (ptr<?>, ptr<?>) -> int
+extern w_gsl_complex_csc : (ptr<?>, ptr<?>) -> int
+extern w_gsl_complex_cot : (ptr<?>, ptr<?>) -> int
+
+extern w_gsl_complex_arcsin : (ptr<?>, ptr<?>) -> int
+extern w_gsl_complex_arcsin_real : (double, ptr<?>) -> int
+extern w_gsl_complex_arccos : (ptr<?>, ptr<?>) -> int
+extern w_gsl_complex_arccos_real : (double, ptr<?>) -> int
+extern w_gsl_complex_arctan : (ptr<?>, ptr<?>) -> int
+extern w_gsl_complex_arcsec : (ptr<?>, ptr<?>) -> int
+extern w_gsl_complex_arcsec_real : (double, ptr<?>) -> int
+extern w_gsl_complex_arccsc : (ptr<?>, ptr<?>) -> int
+extern w_gsl_complex_arccsc_real : (double, ptr<?>) -> int
+extern w_gsl_complex_arccot : (ptr<?>, ptr<?>) -> int
+
+extern w_gsl_complex_sinh : (ptr<?>, ptr<?>) -> int
+extern w_gsl_complex_cosh : (ptr<?>, ptr<?>) -> int
+extern w_gsl_complex_tanh : (ptr<?>, ptr<?>) -> int
+extern w_gsl_complex_sech : (ptr<?>, ptr<?>) -> int
+extern w_gsl_complex_csch : (ptr<?>, ptr<?>) -> int
+extern w_gsl_complex_coth : (ptr<?>, ptr<?>) -> int
+
+extern w_gsl_complex_arcsinh : (ptr<?>, ptr<?>) -> int
+extern w_gsl_complex_arccosh : (ptr<?>, ptr<?>) -> int
+extern w_gsl_complex_arccosh_real : (double, ptr<?>) -> int
+extern w_gsl_complex_arctanh : (ptr<?>, ptr<?>) -> int
+extern w_gsl_complex_arctanh_real : (double, ptr<?>) -> int
+extern w_gsl_complex_arcsech : (ptr<?>, ptr<?>) -> int
+extern w_gsl_complex_arccsch : (ptr<?>, ptr<?>) -> int
+extern w_gsl_complex_arccoth : (ptr<?>, ptr<?>) -> int
+
+public lostanza defn GComplex () -> ref<GComplex> :
+  return new GComplex{0.0, 0.0}
+
+public lostanza defn GComplex (x:ref<Double>, y:ref<Double>) -> ref<GComplex> :
+  val ret = GComplex()
+  call-c w_gsl_complex_rect(addr!(ret.x), x.value, y.value)
+  return ret
+
+public lostanza defn GComplexPolar (r:ref<Double>, th:ref<Double>) -> ref<GComplex> :
+  val ret = GComplex()
+  call-c w_gsl_complex_polar(addr!(ret.x), r.value, th.value)
+  return ret
+
+public lostanza defn real (obj:ref<GComplex>) -> ref<Double> :
+  val ret = call-c w_gsl_complex_real(addr!(obj.x))
+  return  new Double{ret}
+
+public lostanza defn imag (obj:ref<GComplex>) -> ref<Double> :
+  val ret = call-c w_gsl_complex_imag(addr!(obj.x))
+  return  new Double{ret}
+
+public lostanza defn arg (obj:ref<GComplex>) -> ref<Double> :
+  val ret = call-c w_gsl_complex_arg(addr!(obj.x))
+  return new Double{ret}
+
+public lostanza defn abs (obj:ref<GComplex>) -> ref<Double> :
+  val ret = call-c w_gsl_complex_abs(addr!(obj.x))
+  return new Double{ret}
+
+public lostanza defn abs2 (obj:ref<GComplex>) -> ref<Double> :
+  val ret = call-c w_gsl_complex_abs2(addr!(obj.x))
+  return new Double{ret}
+
+public lostanza defn logabs (obj:ref<GComplex>) -> ref<Double> :
+  val ret = call-c w_gsl_complex_logabs(addr!(obj.x))
+  return new Double{ret}
+
+; Operators
+
+public lostanza defn w-gsl-complex-inverse (A:ref<GComplex>) -> ref<GComplex> :
+  val ret = GComplex()
+  call-c w_gsl_complex_inverse(addr!(A.x), addr!(ret.x))
+  return ret
+
+public defn inverse (A:GComplex) -> GComplex:
+  w-gsl-complex-inverse(A)
+
+public lostanza defn w-gsl-complex-negative (A:ref<GComplex>) -> ref<GComplex> :
+  val ret = GComplex()
+  call-c w_gsl_complex_negative(addr!(A.x), addr!(ret.x))
+  return ret
+
+public defn negate (A:GComplex) -> GComplex:
+  w-gsl-complex-negative(A)
+
+public lostanza defn w-gsl-complex-add (A:ref<GComplex>, B:ref<GComplex>) -> ref<GComplex> :
+  val ret = GComplex()
+  call-c w_gsl_complex_add(addr!(A.x), addr!(B.x), addr!(ret.x))
+  return ret
+
+public defn plus (A:GComplex, B:GComplex) -> GComplex:
+  w-gsl-complex-add(A, B)
+
+public lostanza defn w-gsl-complex-sub (A:ref<GComplex>, B:ref<GComplex>) -> ref<GComplex> :
+  val ret = GComplex()
+  call-c w_gsl_complex_sub(addr!(A.x), addr!(B.x), addr!(ret.x))
+  return ret
+
+public defn minus (A:GComplex, B:GComplex) -> GComplex:
+  w-gsl-complex-sub(A, B)
+
+public lostanza defn w-gsl-complex-mul (A:ref<GComplex>, B:ref<GComplex>) -> ref<GComplex> :
+  val ret = GComplex()
+  call-c w_gsl_complex_mul(addr!(A.x), addr!(B.x), addr!(ret.x))
+  return ret
+
+public defn times (A:GComplex, B:GComplex) -> GComplex:
+  w-gsl-complex-mul(A, B)
+
+public lostanza defn w-gsl-complex-div (A:ref<GComplex>, B:ref<GComplex>) -> ref<GComplex> :
+  val ret = GComplex()
+  call-c w_gsl_complex_div(addr!(A.x), addr!(B.x), addr!(ret.x))
+  return ret
+
+public defn divide (A:GComplex, B:GComplex) -> GComplex:
+  w-gsl-complex-div(A, B)
+
+public lostanza defn w-gsl-complex-add-real (A:ref<GComplex>, B:ref<Double>) -> ref<GComplex> :
+  val ret = GComplex()
+  call-c w_gsl_complex_add_real(addr!(A.x), B.value, addr!(ret.x))
+  return ret
+
+public defn plus (A:GComplex, B:Double) -> GComplex:
+  w-gsl-complex-add-real(A, B)
+
+public defn plus (B:Double, A:GComplex) -> GComplex:
+  A + B
+
+public lostanza defn w-gsl-complex-sub-real (A:ref<GComplex>, B:ref<Double>) -> ref<GComplex> :
+  val ret = GComplex()
+  call-c w_gsl_complex_sub_real(addr!(A.x), B.value, addr!(ret.x))
+  return ret
+
+public defn minus (A:GComplex, B:Double) -> GComplex:
+  w-gsl-complex-sub-real(A, B)
+
+public defn minus (B:Double, A:GComplex) -> GComplex:
+  B + negate(A)
+
+public lostanza defn w-gsl-complex-mul-real (A:ref<GComplex>, B:ref<Double>) -> ref<GComplex> :
+  val ret = GComplex()
+  call-c w_gsl_complex_mul_real(addr!(A.x), B.value, addr!(ret.x))
+  return ret
+
+public defn times (A:GComplex, B:Double) -> GComplex:
+  w-gsl-complex-mul-real(A, B)
+
+public defn times (B:Double, A:GComplex) -> GComplex:
+  A * B
+
+public lostanza defn w-gsl-complex-div-real (A:ref<GComplex>, B:ref<Double>) -> ref<GComplex> :
+  val ret = GComplex()
+  call-c w_gsl_complex_div_real(addr!(A.x), B.value, addr!(ret.x))
+  return ret
+
+public defn divide (A:GComplex, B:Double) -> GComplex:
+  w-gsl-complex-div-real(A, B)
+
+public defn divide (B:Double, A:GComplex) -> GComplex:
+  inverse(A) * B
+
+
+; Elementary Functions
+
+public lostanza defn w-gsl-complex-sqrt (A:ref<GComplex>) -> ref<GComplex> :
+  val ret = GComplex()
+  call-c w_gsl_complex_sqrt(addr!(A.x), addr!(ret.x))
+  return ret
+
+public defn sqrt (A:GComplex) -> GComplex :
+  w-gsl-complex-sqrt(A)
+
+public lostanza defn w-gsl-complex-sqrt-real (A:ref<Double>) -> ref<GComplex> :
+  val ret = GComplex()
+  call-c w_gsl_complex_sqrt_real(A.value, addr!(ret.x))
+  return ret
+
+public defn sqrt (A:Double) -> GComplex :
+  w-gsl-complex-sqrt-real(A)
+
+public lostanza defn w-gsl-complex-pow (A:ref<GComplex>, B:ref<GComplex>) -> ref<GComplex> :
+  val ret = GComplex()
+  call-c w_gsl_complex_pow(addr!(A.x), addr!(B.x), addr!(ret.x))
+  return ret
+
+public defn pow (A:GComplex, B:GComplex) -> GComplex :
+  w-gsl-complex-pow(A, B)
+
+public lostanza defn w-gsl-complex-pow-real (A:ref<GComplex>, B:ref<Double>) -> ref<GComplex> :
+  val ret = GComplex()
+  call-c w_gsl_complex_pow_real(addr!(A.x), B.value, addr!(ret.x))
+  return ret
+
+public defn pow (A:GComplex, B:Double) -> GComplex :
+  w-gsl-complex-pow-real(A, B)
+
+; Trig Functions
+
+public lostanza defn w-gsl-complex-sin (A:ref<GComplex>) -> ref<GComplex> :
+  val ret = GComplex()
+  call-c w_gsl_complex_sin(addr!(A.x), addr!(ret.x))
+  return ret
+
+public defn sin (A:GComplex) -> GComplex :
+  w-gsl-complex-sin(A)
+
+public lostanza defn w-gsl-complex-cos (A:ref<GComplex>) -> ref<GComplex> :
+  val ret = GComplex()
+  call-c w_gsl_complex_cos(addr!(A.x), addr!(ret.x))
+  return ret
+
+public defn cos (A:GComplex) -> GComplex :
+  w-gsl-complex-cos(A)
+
+public lostanza defn w-gsl-complex-tan (A:ref<GComplex>) -> ref<GComplex> :
+  val ret = GComplex()
+  call-c w_gsl_complex_tan(addr!(A.x), addr!(ret.x))
+  return ret
+
+public defn tan (A:GComplex) -> GComplex :
+  w-gsl-complex-tan(A)
+
+public lostanza defn w-gsl-complex-sec (A:ref<GComplex>) -> ref<GComplex> :
+  val ret = GComplex()
+  call-c w_gsl_complex_sec(addr!(A.x), addr!(ret.x))
+  return ret
+
+public defn sec (A:GComplex) -> GComplex :
+  w-gsl-complex-sec(A)
+
+public lostanza defn w-gsl-complex-csc (A:ref<GComplex>) -> ref<GComplex> :
+  val ret = GComplex()
+  call-c w_gsl_complex_csc(addr!(A.x), addr!(ret.x))
+  return ret
+
+public defn csc (A:GComplex) -> GComplex :
+  w-gsl-complex-csc(A)
+
+public lostanza defn w-gsl-complex-cot (A:ref<GComplex>) -> ref<GComplex> :
+  val ret = GComplex()
+  call-c w_gsl_complex_cot(addr!(A.x), addr!(ret.x))
+  return ret
+
+public defn cot (A:GComplex) -> GComplex :
+  w-gsl-complex-cot(A)
+
+; Inverse Trig
+
+public lostanza defn w-gsl-complex-arcsin (A:ref<GComplex>) -> ref<GComplex> :
+  val ret = GComplex()
+  call-c w_gsl_complex_arcsin(addr!(A.x), addr!(ret.x))
+  return ret
+
+public defn arcsin (A:GComplex) -> GComplex :
+  w-gsl-complex-arcsin(A)
+
+public lostanza defn w-gsl-complex-arccos (A:ref<GComplex>) -> ref<GComplex> :
+  val ret = GComplex()
+  call-c w_gsl_complex_arccos(addr!(A.x), addr!(ret.x))
+  return ret
+
+public defn arccos (A:GComplex) -> GComplex :
+  w-gsl-complex-arccos(A)
+
+public lostanza defn w-gsl-complex-arccos-real (A:ref<Double>) -> ref<GComplex> :
+  val ret = GComplex()
+  call-c w_gsl_complex_arccos_real(A.value, addr!(ret.x))
+  return ret
+
+public defn arccos (A:Double) -> GComplex :
+  w-gsl-complex-arccos-real(A)
+
+public lostanza defn w-gsl-complex-arctan (A:ref<GComplex>) -> ref<GComplex> :
+  val ret = GComplex()
+  call-c w_gsl_complex_arctan(addr!(A.x), addr!(ret.x))
+  return ret
+
+public defn arctan (A:GComplex) -> GComplex :
+  w-gsl-complex-arctan(A)
+
+public lostanza defn w-gsl-complex-arcsec (A:ref<GComplex>) -> ref<GComplex> :
+  val ret = GComplex()
+  call-c w_gsl_complex_arcsec(addr!(A.x), addr!(ret.x))
+  return ret
+
+public defn arcsec (A:GComplex) -> GComplex :
+  w-gsl-complex-arcsec(A)
+
+public lostanza defn w-gsl-complex-arcsec-real (A:ref<Double>) -> ref<GComplex> :
+  val ret = GComplex()
+  call-c w_gsl_complex_arcsec_real(A.value, addr!(ret.x))
+  return ret
+
+public defn arcsec (A:Double) -> GComplex :
+  w-gsl-complex-arcsec-real(A)
+
+public lostanza defn w-gsl-complex-arccsc (A:ref<GComplex>) -> ref<GComplex> :
+  val ret = GComplex()
+  call-c w_gsl_complex_arccsc(addr!(A.x), addr!(ret.x))
+  return ret
+
+public defn arccsc (A:GComplex) -> GComplex :
+  w-gsl-complex-arccsc(A)
+
+public lostanza defn w-gsl-complex-arccsc-real (A:ref<Double>) -> ref<GComplex> :
+  val ret = GComplex()
+  call-c w_gsl_complex_arccsc_real(A.value, addr!(ret.x))
+  return ret
+
+public defn arccsc (A:Double) -> GComplex :
+  w-gsl-complex-arccsc-real(A)
+
+public lostanza defn w-gsl-complex-arccot (A:ref<GComplex>) -> ref<GComplex> :
+  val ret = GComplex()
+  call-c w_gsl_complex_arccot(addr!(A.x), addr!(ret.x))
+  return ret
+
+public defn arccot (A:GComplex) -> GComplex :
+  w-gsl-complex-arccot(A)
+
+; Hyperbolic Functions
+
+public lostanza defn w-gsl-complex-sinh (A:ref<GComplex>) -> ref<GComplex> :
+  val ret = GComplex()
+  call-c w_gsl_complex_sinh(addr!(A.x), addr!(ret.x))
+  return ret
+
+public defn sinh (A:GComplex) -> GComplex :
+  w-gsl-complex-sinh(A)
+
+public lostanza defn w-gsl-complex-cosh (A:ref<GComplex>) -> ref<GComplex> :
+  val ret = GComplex()
+  call-c w_gsl_complex_cosh(addr!(A.x), addr!(ret.x))
+  return ret
+
+public defn cosh (A:GComplex) -> GComplex :
+  w-gsl-complex-cosh(A)
+
+public lostanza defn w-gsl-complex-tanh (A:ref<GComplex>) -> ref<GComplex> :
+  val ret = GComplex()
+  call-c w_gsl_complex_tanh(addr!(A.x), addr!(ret.x))
+  return ret
+
+public defn tanh (A:GComplex) -> GComplex :
+  w-gsl-complex-tanh(A)
+
+public lostanza defn w-gsl-complex-sech (A:ref<GComplex>) -> ref<GComplex> :
+  val ret = GComplex()
+  call-c w_gsl_complex_sech(addr!(A.x), addr!(ret.x))
+  return ret
+
+public defn sech (A:GComplex) -> GComplex :
+  w-gsl-complex-sech(A)
+
+public lostanza defn w-gsl-complex-csch (A:ref<GComplex>) -> ref<GComplex> :
+  val ret = GComplex()
+  call-c w_gsl_complex_csch(addr!(A.x), addr!(ret.x))
+  return ret
+
+public defn csch (A:GComplex) -> GComplex :
+  w-gsl-complex-csch(A)
+
+public lostanza defn w-gsl-complex-coth (A:ref<GComplex>) -> ref<GComplex> :
+  val ret = GComplex()
+  call-c w_gsl_complex_coth(addr!(A.x), addr!(ret.x))
+  return ret
+
+public defn coth (A:GComplex) -> GComplex :
+  w-gsl-complex-coth(A)
+
+; Inverse Hyperbolic Function
+
+public lostanza defn w-gsl-complex-arcsinh (A:ref<GComplex>) -> ref<GComplex> :
+  val ret = GComplex()
+  call-c w_gsl_complex_arcsinh(addr!(A.x), addr!(ret.x))
+  return ret
+
+public defn arcsinh (A:GComplex) -> GComplex :
+  w-gsl-complex-arcsinh(A)
+
+public lostanza defn w-gsl-complex-arccosh (A:ref<GComplex>) -> ref<GComplex> :
+  val ret = GComplex()
+  call-c w_gsl_complex_arccosh(addr!(A.x), addr!(ret.x))
+  return ret
+
+public defn arccosh (A:GComplex) -> GComplex :
+  w-gsl-complex-arccosh(A)
+
+public lostanza defn w-gsl-complex-arccosh-real (A:ref<Double>) -> ref<GComplex> :
+  val ret = GComplex()
+  call-c w_gsl_complex_arccosh_real(A.value, addr!(ret.x))
+  return ret
+
+public defn arccosh (A:Double) -> GComplex :
+  w-gsl-complex-arccosh-real(A)
+
+public lostanza defn w-gsl-complex-arctanh (A:ref<GComplex>) -> ref<GComplex> :
+  val ret = GComplex()
+  call-c w_gsl_complex_arctanh(addr!(A.x), addr!(ret.x))
+  return ret
+
+public defn arctanh (A:GComplex) -> GComplex :
+  w-gsl-complex-arctanh(A)
+
+public lostanza defn w-gsl-complex-arctanh-real (A:ref<Double>) -> ref<GComplex> :
+  val ret = GComplex()
+  call-c w_gsl_complex_arctanh_real(A.value, addr!(ret.x))
+  return ret
+
+public defn arctanh (A:Double) -> GComplex :
+  w-gsl-complex-arctanh-real(A)
+
+public lostanza defn w-gsl-complex-arcsech (A:ref<GComplex>) -> ref<GComplex> :
+  val ret = GComplex()
+  call-c w_gsl_complex_arcsech(addr!(A.x), addr!(ret.x))
+  return ret
+
+public defn arcsech (A:GComplex) -> GComplex :
+  w-gsl-complex-arcsech(A)
+
+public lostanza defn w-gsl-complex-arccsch (A:ref<GComplex>) -> ref<GComplex> :
+  val ret = GComplex()
+  call-c w_gsl_complex_arccsch(addr!(A.x), addr!(ret.x))
+  return ret
+
+public defn arccsch (A:GComplex) -> GComplex :
+  w-gsl-complex-arccsch(A)
+
+public lostanza defn w-gsl-complex-arccoth (A:ref<GComplex>) -> ref<GComplex> :
+  val ret = GComplex()
+  call-c w_gsl_complex_arccoth(addr!(A.x), addr!(ret.x))
+  return ret
+
+public defn arccoth (A:GComplex) -> GComplex :
+  w-gsl-complex-arccoth(A)
