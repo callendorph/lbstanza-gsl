@@ -1,0 +1,29 @@
+defpackage gsl/Utils :
+  import core
+
+public lostanza deftype GMinMaxDouble:
+  var minV:double
+  var maxV:double
+
+public lostanza defn GMinMax () -> ref<GMinMaxDouble> :
+  return new GMinMaxDouble{0.0, 0.0}
+
+public lostanza defn to-tuple (self:ref<GMinMaxDouble>) -> ref<[Double, Double]> :
+  val ret = core/void-tuple(2)
+  ret.items[0] = new Double{self.minV}
+  ret.items[1] = new Double{self.maxV}
+  return ret as ref<[Double, Double]>
+
+
+public lostanza deftype GMinMaxInt:
+  var minV:int
+  var maxV:int
+
+public lostanza defn GMinMaxInt () -> ref<GMinMaxInt> :
+  return new GMinMaxInt{-1, -1}
+
+public lostanza defn to-tuple (self:ref<GMinMaxInt>) -> ref<[Int, Int]> :
+  val ret = core/void-tuple(2)
+  ret.items[0] = new Int{self.minV}
+  ret.items[1] = new Int{self.maxV}
+  return ret as ref<[Int, Int]>

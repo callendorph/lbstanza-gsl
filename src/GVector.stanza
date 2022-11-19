@@ -2,6 +2,7 @@ defpackage gsl/GVector :
   import core
   import collections
   import gsl/Errors
+  import gsl/Utils
 
 extern gsl_vector_alloc : int -> ptr<?>
 extern gsl_vector_free : ptr<?> -> int
@@ -235,17 +236,10 @@ public defn maximum (A:GVector) -> Double :
 public defn minimum (A:GVector) -> Double :
   gsl-vector-min(A)
 
-lostanza deftype GVMinMaxDouble:
-  var minV:double
-  var maxV:double
-
 public lostanza defn gsl-vector-minmax (A:ref<GVector>) -> ref<[Double, Double]> :
-  val mm = new GVMinMaxDouble{0.0, 0.0}
+  val mm = GMinMax()
   call-c gsl_vector_minmax(A.value, addr!(mm.minV), addr!(mm.maxV))
-  val ret = core/void-tuple(2)
-  ret.items[0] = new Double{mm.minV}
-  ret.items[1] = new Double{mm.maxV}
-  return ret as ref<[Double, Double]>
+  return to-tuple(mm)
 
 public defn minmax (A:GVector) -> [Double, Double] :
   gsl-vector-minmax(A)
@@ -264,17 +258,10 @@ public lostanza defn gsl-vector-min-index (A:ref<GVector>) -> ref<Int> :
 public defn argmin (A:GVector) -> Int :
   gsl-vector-min-index(A)
 
-lostanza deftype GVMinMaxInt:
-  var minV:int
-  var maxV:int
-
 public lostanza defn gsl-vector-minmax-index (A:ref<GVector>) -> ref<[Int,Int]> :
-  val mm = new GVMinMaxInt{-1, -1}
+  val mm = GMinMaxInt()
   call-c gsl_vector_minmax_index(A.value, addr!(mm.minV), addr!(mm.maxV))
-  val ret = core/void-tuple(2)
-  ret.items[0] = new Int{mm.minV}
-  ret.items[1] = new Int{mm.maxV}
-  return ret as ref<[Int, Int]>
+  return to-tuple(mm)
 
 public defn argminmax (A:GVector) -> [Int, Int] :
   gsl-vector-minmax-index(A)
