@@ -1,0 +1,220 @@
+defpackage gsl/GMatrix :
+  import core
+  import gsl/Errors
+
+extern gsl_matrix_alloc : (int,int) -> ptr<?>
+extern gsl_matrix_free : ptr<?> -> int
+extern gsl_matrix_get : (ptr<?>, int, int) -> double
+extern gsl_matrix_set : (ptr<?>, int, int, double) -> int
+extern gsl_matrix_set_all : (ptr<?>, double) -> int
+extern gsl_matrix_set_zero : (ptr<?>) -> int
+extern gsl_matrix_set_identity : (ptr<?>) -> int
+
+extern gsl_matrix_memcpy : (ptr<?>, ptr<?>) -> int
+extern gsl_matrix_transpose : (ptr<?>) -> int
+extern gsl_matrix_transpose_memcpy : (ptr<?>, ptr<?>) -> int
+
+extern gsl_matrix_add : (ptr<?>, ptr<?>) -> int
+extern gsl_matrix_sub : (ptr<?>, ptr<?>) -> int
+extern gsl_matrix_mul_elements : (ptr<?>, ptr<?>) -> int
+extern gsl_matrix_div_elements : (ptr<?>, ptr<?>) -> int
+extern gsl_matrix_scale : (ptr<?>, double) -> int
+extern gsl_matrix_scale_columns : (ptr<?>, ptr<?>) -> int
+extern gsl_matrix_scale_rows : (ptr<?>, ptr<?>) -> int
+extern gsl_matrix_add_constant : (ptr<?>, double) -> int
+
+
+lostanza deftype GMatrixFinalizer <: Finalizer:
+  value:ptr<?>
+
+lostanza defmethod run (v:ref<GMatrixFinalizer>) -> ref<False> :
+  call-c gsl_matrix_free(v.value)
+  return false
+
+public lostanza deftype GMatrix <: Unique :
+  value:ptr<?>
+  rows:int
+  cols:int
+
+public lostanza defn GMatrix (rows:ref<Int>, cols:ref<Int>) -> ref<GMatrix> :
+  val ptr = call-c gsl_matrix_alloc(rows.value, cols.value)
+  val null = 0L as ptr<?>
+  if ptr == null :
+    throw(GSLException(gsl-ENOMEM()))
+  val ret = new GMatrix{ptr,rows.value,cols.value}
+  add-finalizer(new GMatrixFinalizer{ptr}, ret)
+  return ret
+
+public lostanza defn GMatrix (other:ref<GMatrix>) -> ref<GMatrix> :
+  val ret = GMatrix(new Int{other.rows}, new Int{other.cols})
+  val result = call-c gsl_matrix_memcpy(ret.value, other.value)
+  if result != 0 :
+    throw(GSLException(new Int{result}))
+  return ret
+
+public lostanza defn get (self:ref<GMatrix>, i:ref<Int>, j:ref<Int>) -> ref<Double> :
+  val ret = call-c gsl_matrix_get(self.value, i.value, j.value)
+  return new Double{ret}
+
+public lostanza defn set (self:ref<GMatrix>, i:ref<Int>, j:ref<Int>, x:ref<Double>) -> ref<False> :
+  call-c gsl_matrix_set(self.value, i.value, j.value, x.value)
+  return false
+
+public lostanza defn set-all (self:ref<GMatrix>, x:ref<Double>) -> ref<False> :
+  call-c gsl_matrix_set_all(self.value, x.value)
+  return false
+
+public lostanza defn set-zero (self:ref<GMatrix>) -> ref<False> :
+  call-c gsl_matrix_set_zero(self.value)
+  return false
+
+public lostanza defn set-identity (self:ref<GMatrix>) -> ref<False> :
+  call-c gsl_matrix_set_identity(self.value)
+  return false
+
+public lostanza defn rows (self:ref<GMatrix>) -> ref<Int> :
+  return new Int{self.rows}
+
+public lostanza defn columns (self:ref<GMatrix>) -> ref<Int> :
+  return new Int{self.cols}
+
+public lostanza defn transpose! (self:ref<GMatrix>) -> ref<False> :
+  val result = call-c gsl_matrix_transpose(self.value)
+  if result != 0 :
+    throw(GSLException(new Int{result}))
+  return false
+
+public lostanza defn transpose (self:ref<GMatrix>) -> ref<GMatrix> :
+  ; Note reversed rows and columns in construction of this
+  ;  matrix.
+  val ret = GMatrix(columns(self), rows(self))
+  val result = call-c gsl_matrix_transpose_memcpy(ret.value, self.value)
+  if result != 0 :
+    throw(GSLException(new Int{result}))
+  return ret
+
+; Operators
+
+public lostanza defn gsl-matrix-add (A:ref<GMatrix>, B:ref<GMatrix>) -> ref<Int> :
+  val code = call-c gsl_matrix_add(A.value, B.value)
+  return new Int{code}
+
+public defn plus! (A:GMatrix, B:GMatrix) :
+  val code = gsl-matrix-add(A, B)
+  if code != 0 :
+    throw(GSLException(code))
+
+public defn plus (A:GMatrix, B:GMatrix) -> GMatrix :
+  val ret = GMatrix(A)
+  plus!(ret, B)
+  ret
+
+public lostanza defn gsl-matrix-add-constant (A:ref<GMatrix>, B:ref<Double>) -> ref<Int> :
+  val code = call-c gsl_matrix_add_constant(A.value, B.value)
+  return new Int{code}
+
+public defn plus! (A:GMatrix, B:Double) :
+  val code = gsl-matrix-add-constant(A, B)
+  if code != 0 :
+    throw(GSLException(code))
+
+public defn plus (A:GMatrix, B:Double) -> GMatrix :
+  val ret = GMatrix(A)
+  plus!(ret, B)
+  ret
+
+public defn plus (B:Double, A:GMatrix) -> GMatrix :
+  A + B
+
+public lostanza defn gsl-matrix-mul-elements (A:ref<GMatrix>, B:ref<GMatrix>) -> ref<Int> :
+  val code = call-c gsl_matrix_mul_elements(A.value, B.value)
+  return new Int{code}
+
+public defn times! (A:GMatrix, B:GMatrix) :
+  val code = gsl-matrix-mul-elements(A, B)
+  if code != 0 :
+    throw(GSLException(code))
+
+public defn times (A:GMatrix, B:GMatrix) -> GMatrix :
+  val ret = GMatrix(A)
+  times!(ret, B)
+  ret
+
+public lostanza defn gsl-matrix-scale (A:ref<GMatrix>, B:ref<Double>) -> ref<Int> :
+  val code = call-c gsl_matrix_scale(A.value, B.value)
+  return new Int{code}
+
+public defn times! (A:GMatrix, B:Double) :
+  val code = gsl-matrix-scale(A, B)
+  if code != 0 :
+    throw(GSLException(code))
+
+public defn times (A:GMatrix, B:Double) -> GMatrix :
+  val ret = GMatrix(A)
+  times!(ret, B)
+  ret
+
+public defn times (B:Double, A:GMatrix) -> GMatrix :
+  A * B
+
+public defn negate! (A:GMatrix) :
+  times!(A, -1.0)
+
+public defn negate (A:GMatrix) -> GMatrix :
+  val ret = GMatrix(A)
+  negate!(ret)
+  ret
+
+public lostanza defn gsl-matrix-sub (A:ref<GMatrix>, B:ref<GMatrix>) -> ref<Int> :
+  val code = call-c gsl_matrix_sub(A.value, B.value)
+  return new Int{code}
+
+public defn minus! (A:GMatrix, B:GMatrix) :
+  val code = gsl-matrix-sub(A, B)
+  if code != 0 :
+    throw(GSLException(code))
+
+public defn minus (A:GMatrix, B:GMatrix) -> GMatrix :
+  val ret = GMatrix(A)
+  minus!(ret, B)
+  ret
+
+public defn minus! (A:GMatrix, B:Double) :
+  val code = gsl-matrix-add-constant(A, negate(B))
+  if code != 0 :
+    throw(GSLException(code))
+
+public defn minus (A:GMatrix, B:Double) -> GMatrix :
+  val ret = GMatrix(A)
+  minus!(ret, B)
+  ret
+
+public defn minus (B:Double, A:GMatrix) -> GMatrix :
+  B + (- A)
+
+public lostanza defn gsl-matrix-div-elements (A:ref<GMatrix>, B:ref<GMatrix>) -> ref<Int> :
+  val code = call-c gsl_matrix_div_elements(A.value, B.value)
+  return new Int{code}
+
+public defn divide! (A:GMatrix, B:GMatrix) :
+  val code = gsl-matrix-div-elements(A, B)
+  if code != 0 :
+    throw(GSLException(code))
+
+public defn divide (A:GMatrix, B:GMatrix) -> GMatrix :
+  val ret = GMatrix(A)
+  divide!(ret, B)
+  ret
+
+public defn divide! (A:GMatrix, B:Double) :
+  times!(A, 1.0 / B)
+
+public defn divide (A:GMatrix, B:Double) -> GMatrix :
+  times(A, 1.0 / B)
+
+public defn divide (B:Double, A:GMatrix) -> GMatrix :
+  val ret = GMatrix(rows(A), columns(A))
+  set-all(ret, B)
+  divide!(ret, A)
+  ret
+

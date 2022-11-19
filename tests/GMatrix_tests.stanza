@@ -1,0 +1,254 @@
+#use-added-syntax(tests)
+defpackage gsl/GMatrix/tests :
+  import core
+  import gsl/GMatrix
+  import gsl/Errors
+
+#if-defined(TESTING) :
+  public defn expect-throw (f) -> [True|False, String] :
+    try :
+      val unexpected = f()
+      [false, "No Exception Thrown"]
+    catch (e:Exception) :
+      val msg = to-string("%~" % [e])
+      [true, msg]
+
+deftest(gmatrix) gsl-gmatrix-basic:
+  val a = GMatrix(2,2)
+
+  a[0,0] = 1.0
+  a[0,1] = 2.0
+  a[1,0] = 3.0
+  a[1,1] = 4.0
+
+  #EXPECT(a[0,0] == 1.0)
+  #EXPECT(a[0,1] == 2.0)
+  #EXPECT(a[1,0] == 3.0)
+  #EXPECT(a[1,1] == 4.0)
+
+  set-identity(a)
+
+  #EXPECT(a[0,0] == 1.0)
+  #EXPECT(a[0,1] == 0.0)
+  #EXPECT(a[1,0] == 0.0)
+  #EXPECT(a[1,1] == 1.0)
+
+  set-zero(a)
+
+  #EXPECT(a[0,0] == 0.0)
+  #EXPECT(a[0,1] == 0.0)
+  #EXPECT(a[1,0] == 0.0)
+  #EXPECT(a[1,1] == 0.0)
+
+  set-all(a, 2.0)
+
+  #EXPECT(a[0,0] == 2.0)
+  #EXPECT(a[0,1] == 2.0)
+  #EXPECT(a[1,0] == 2.0)
+  #EXPECT(a[1,1] == 2.0)
+
+  #EXPECT(rows(a) == 2)
+  #EXPECT(columns(a) == 2)
+
+deftest(gmatrix) gsl-matrix-transpose:
+
+  val a = GMatrix(2,2)
+
+  a[0,0] = 1.0
+  a[0,1] = 2.0
+  a[1,0] = 3.0
+  a[1,1] = 4.0
+
+  transpose!(a)
+
+  #EXPECT(a[0,0] == 1.0)
+  #EXPECT(a[0,1] == 3.0)
+  #EXPECT(a[1,0] == 2.0)
+  #EXPECT(a[1,1] == 4.0)
+
+  val b = GMatrix(3, 2)
+
+  #EXPECT(rows(b) == 3)
+  #EXPECT(columns(b) == 2)
+
+  b[0,0] = 1.0
+  b[0,1] = 2.0
+  b[1,0] = 3.0
+  b[1,1] = 4.0
+  b[2,0] = 5.0
+  b[2,1] = 6.0
+
+  val c = transpose(b)
+
+  #EXPECT(rows(c) == 2)
+  #EXPECT(columns(c) == 3)
+
+  #EXPECT(c[0,0] == 1.0)
+  #EXPECT(c[0,1] == 3.0)
+  #EXPECT(c[0,2] == 5.0)
+  #EXPECT(c[1,0] == 2.0)
+  #EXPECT(c[1,1] == 4.0)
+  #EXPECT(c[1,2] == 6.0)
+
+deftest(gmatrix) gsl-gmatrix-operators:
+
+  val a = GMatrix(2,2)
+
+  a[0,0] = 1.0
+  a[0,1] = 2.0
+  a[1,0] = 3.0
+  a[1,1] = 4.0
+
+  val b = GMatrix(2,2)
+
+  b[0,0] = 4.0
+  b[0,1] = 5.0
+  b[1,0] = 6.0
+  b[1,1] = 7.0
+
+  var c = a + b
+
+  #EXPECT(c[0,0] == 5.0)
+  #EXPECT(c[0,1] == 7.0)
+  #EXPECT(c[1,0] == 9.0)
+  #EXPECT(c[1,1] == 11.0)
+
+  c = b + a
+
+  #EXPECT(c[0,0] == 5.0)
+  #EXPECT(c[0,1] == 7.0)
+  #EXPECT(c[1,0] == 9.0)
+  #EXPECT(c[1,1] == 11.0)
+
+  c = a - b
+
+  #EXPECT(c[0,0] == -3.0)
+  #EXPECT(c[0,1] == -3.0)
+  #EXPECT(c[1,0] == -3.0)
+  #EXPECT(c[1,1] == -3.0)
+
+  c = b - a
+
+  #EXPECT(c[0,0] == 3.0)
+  #EXPECT(c[0,1] == 3.0)
+  #EXPECT(c[1,0] == 3.0)
+  #EXPECT(c[1,1] == 3.0)
+
+  c = a * b
+
+  #EXPECT(c[0,0] == 4.0)
+  #EXPECT(c[0,1] == 10.0)
+  #EXPECT(c[1,0] == 18.0)
+  #EXPECT(c[1,1] == 28.0)
+
+  c = b * a
+
+  #EXPECT(c[0,0] == 4.0)
+  #EXPECT(c[0,1] == 10.0)
+  #EXPECT(c[1,0] == 18.0)
+  #EXPECT(c[1,1] == 28.0)
+
+  c = a / b
+
+  #EXPECT(c[0,0] == 0.25)
+  #EXPECT(c[0,1] == 0.4)
+  #EXPECT(c[1,0] == 0.5)
+  #EXPECT(c[1,1] == 4.0 / 7.0)
+
+  c = b / a
+
+  #EXPECT(c[0,0] == 4.0)
+  #EXPECT(c[0,1] == 2.5)
+  #EXPECT(c[1,0] == 2.0)
+  #EXPECT(c[1,1] == 7.0 / 4.0)
+
+deftest(gmatrix) gsl-gmatrix-constant-operators:
+
+  val a = GMatrix(2,2)
+
+  a[0,0] = 1.0
+  a[0,1] = 2.0
+  a[1,0] = 3.0
+  a[1,1] = 4.0
+
+  val b = 2.0
+
+  var c = a + b
+
+  #EXPECT(c[0,0] == 3.0)
+  #EXPECT(c[0,1] == 4.0)
+  #EXPECT(c[1,0] == 5.0)
+  #EXPECT(c[1,1] == 6.0)
+
+  c = b + a
+
+  #EXPECT(c[0,0] == 3.0)
+  #EXPECT(c[0,1] == 4.0)
+  #EXPECT(c[1,0] == 5.0)
+  #EXPECT(c[1,1] == 6.0)
+
+  c = a - b
+
+  #EXPECT(c[0,0] == -1.0)
+  #EXPECT(c[0,1] == 0.0)
+  #EXPECT(c[1,0] == 1.0)
+  #EXPECT(c[1,1] == 2.0)
+
+  c = b - a
+
+  #EXPECT(c[0,0] == 1.0)
+  #EXPECT(c[0,1] == 0.0)
+  #EXPECT(c[1,0] == -1.0)
+  #EXPECT(c[1,1] == -2.0)
+
+  c = a * b
+
+  #EXPECT(c[0,0] == 2.0)
+  #EXPECT(c[0,1] == 4.0)
+  #EXPECT(c[1,0] == 6.0)
+  #EXPECT(c[1,1] == 8.0)
+
+  c = b * a
+
+  #EXPECT(c[0,0] == 2.0)
+  #EXPECT(c[0,1] == 4.0)
+  #EXPECT(c[1,0] == 6.0)
+  #EXPECT(c[1,1] == 8.0)
+
+  c = a / b
+
+  #EXPECT(c[0,0] == 0.5)
+  #EXPECT(c[0,1] == 1.0)
+  #EXPECT(c[1,0] == 1.5)
+  #EXPECT(c[1,1] == 2.0)
+
+  c = b / a
+
+  #EXPECT(c[0,0] == 2.0)
+  #EXPECT(c[0,1] == 1.0)
+  #EXPECT(c[1,0] == 2.0 / 3.0)
+  #EXPECT(c[1,1] == 0.5)
+
+deftest(gmatrix) gsl-gmatrix-operator-errors:
+
+  set-error-handler-off()
+
+  val a = GMatrix(2,2)
+  set-zero(a)
+
+  val b = GMatrix(3,3)
+  set-identity(b)
+
+  val invalid-math = [
+    {a + b},
+    {a - b},
+    {a * b},
+    {a / b},
+  ]
+
+  for failFunc in invalid-math do :
+    val [throws, msg] = expect-throw(failFunc)
+    #EXPECT( throws )
+    #EXPECT(index-of-chars(msg, "sizes are not conformant") != false)
+
+  reset-error-handler()
