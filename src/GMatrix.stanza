@@ -31,6 +31,12 @@ extern gsl_matrix_max_index : (ptr<?>, ptr<?>, ptr<?>) -> int
 extern gsl_matrix_min_index : (ptr<?>, ptr<?>, ptr<?>) -> int
 extern gsl_matrix_minmax_index : (ptr<?>, ptr<?>, ptr<?>, ptr<?>, ptr<?>) -> int
 
+extern gsl_matrix_norm1 : (ptr<?>) -> double
+extern gsl_matrix_isnull : (ptr<?>) -> int
+extern gsl_matrix_isneg : (ptr<?>) -> int
+extern gsl_matrix_ispos : (ptr<?>) -> int
+extern gsl_matrix_isnonneg : (ptr<?>) -> int
+
 
 lostanza deftype GMatrixFinalizer <: Finalizer:
   value:ptr<?>
@@ -100,6 +106,39 @@ public lostanza defn transpose (self:ref<GMatrix>) -> ref<GMatrix> :
   if result != 0 :
     throw(GSLException(new Int{result}))
   return ret
+
+public lostanza defn norm1 (self:ref<GMatrix>) -> ref<Double> :
+  val ret = call-c gsl_matrix_norm1(self.value)
+  return new Double{ret}
+
+lostanza defn isnull (self:ref<GMatrix>) -> ref<Int> :
+  val ret = call-c gsl_matrix_isnull(self.value)
+  return new Int{ret}
+
+public defn zero? (self:GMatrix) -> True|False :
+  isnull(self) == 1
+
+lostanza defn ispos (self:ref<GMatrix>) -> ref<Int> :
+  val ret = call-c gsl_matrix_ispos(self.value)
+  return new Int{ret}
+
+public defn positive? (self:GMatrix) -> True|False :
+  ispos(self) == 1
+
+lostanza defn isneg (self:ref<GMatrix>) -> ref<Int> :
+  val ret = call-c gsl_matrix_isneg(self.value)
+  return new Int{ret}
+
+public defn negative? (self:GMatrix) -> True|False :
+  isneg(self) == 1
+
+lostanza defn isnonneg (self:ref<GMatrix>) -> ref<Int> :
+  val ret = call-c gsl_matrix_isnonneg(self.value)
+  return new Int{ret}
+
+public defn non-negative? (self:GMatrix) -> True|False :
+  isnonneg(self) == 1
+
 
 ; Operators
 
