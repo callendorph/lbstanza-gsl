@@ -1,6 +1,7 @@
 defpackage gsl/GMatrix :
   import core
   import gsl/Errors
+  import gsl/Utils
 
 extern gsl_matrix_alloc : (int,int) -> ptr<?>
 extern gsl_matrix_free : ptr<?> -> int
@@ -22,6 +23,13 @@ extern gsl_matrix_scale : (ptr<?>, double) -> int
 extern gsl_matrix_scale_columns : (ptr<?>, ptr<?>) -> int
 extern gsl_matrix_scale_rows : (ptr<?>, ptr<?>) -> int
 extern gsl_matrix_add_constant : (ptr<?>, double) -> int
+
+extern gsl_matrix_max : (ptr<?>) -> double
+extern gsl_matrix_min : (ptr<?>) -> double
+extern gsl_matrix_minmax : (ptr<?>, ptr<?>, ptr<?>) -> int
+extern gsl_matrix_max_index : (ptr<?>, ptr<?>, ptr<?>) -> int
+extern gsl_matrix_min_index : (ptr<?>, ptr<?>, ptr<?>) -> int
+extern gsl_matrix_minmax_index : (ptr<?>, ptr<?>, ptr<?>, ptr<?>, ptr<?>) -> int
 
 
 lostanza deftype GMatrixFinalizer <: Finalizer:
@@ -218,3 +226,69 @@ public defn divide (B:Double, A:GMatrix) -> GMatrix :
   divide!(ret, A)
   ret
 
+; Min / Max Element Methods
+
+public lostanza defn gsl-matrix-max (A:ref<GMatrix>) -> ref<Double> :
+  val ret = call-c gsl_matrix_max(A.value)
+  return new Double{ret}
+
+public lostanza defn gsl-matrix-min (A:ref<GMatrix>) -> ref<Double> :
+  val ret = call-c gsl_matrix_min(A.value)
+  return new Double{ret}
+
+public defn maximum (A:GMatrix) -> Double :
+  gsl-matrix-max(A)
+
+public defn minimum (A:GMatrix) -> Double :
+  gsl-matrix-min(A)
+
+public lostanza defn gsl-matrix-minmax (A:ref<GMatrix>) -> ref<[Double, Double]> :
+  val mm = GMinMax()
+  call-c gsl_matrix_minmax(A.value, addr!(mm.minV), addr!(mm.maxV))
+  return to-tuple(mm)
+
+public defn minmax (A:GMatrix) -> [Double, Double] :
+  gsl-matrix-minmax(A)
+
+public lostanza defn gsl-matrix-max-index (A:ref<GMatrix>) -> ref<[Int, Int]> :
+  ; This is a bit of a hack - I'm reusing this
+  ;   int, int for the minmax-int to get the `i,j` indices of the
+  ;   matrix
+  val mm = GMinMaxInt()
+  call-c gsl_matrix_max_index(A.value, addr!(mm.minV), addr!(mm.maxV))
+  ; Returns the (i,j) coordinates of the max
+  return to-tuple(mm)
+
+public defn argmax (A:GMatrix) -> [Int, Int] :
+  gsl-matrix-max-index(A)
+
+public lostanza defn gsl-matrix-min-index (A:ref<GMatrix>) -> ref<[Int, Int]> :
+  ; This is a bit of a hack - I'm reusing this
+  ;   int, int for the minmax-int to get the `i,j` indices of the
+  ;   matrix
+  val mm = GMinMaxInt()
+  call-c gsl_matrix_min_index(A.value, addr!(mm.minV), addr!(mm.maxV))
+  ; Returns the (i,j) coordinates of the max
+  return to-tuple(mm)
+
+public defn argmin (A:GMatrix) -> [Int, Int] :
+  gsl-matrix-min-index(A)
+
+lostanza defn to-tuple (mMin:ref<GMinMaxInt>, mMax:ref<GMinMaxInt>) -> ref<[[Int, Int], [Int, Int]]> :
+  val ret = core/void-tuple(2)
+  ret.items[0] = to-tuple(mMin)
+  ret.items[1] = to-tuple(mMax)
+  return ret as ref<[[Int, Int], [Int, Int]]>
+
+public lostanza defn gsl-matrix-minmax-index (A:ref<GMatrix>) -> ref<[[Int, Int], [Int, Int]]> :
+  ; This is a bit of a hack - I'm reusing this
+  ;   int, int for the minmax-int to get the `i,j` indices of the
+  ;   matrix
+  val mMin = GMinMaxInt()
+  val mMax = GMinMaxInt()
+  call-c gsl_matrix_minmax_index(A.value, addr!(mMin.minV), addr!(mMin.maxV), addr!(mMax.minV), addr!(mMax.maxV))
+  ; Returns the (i,j) coordinates of the max
+  return to-tuple(mMin, mMax)
+
+public defn argminmax (A:GMatrix) -> [[Int, Int], [Int, Int]] :
+  gsl-matrix-minmax-index(A)
