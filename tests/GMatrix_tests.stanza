@@ -252,3 +252,25 @@ deftest(gmatrix) gsl-gmatrix-operator-errors:
     #EXPECT(index-of-chars(msg, "sizes are not conformant") != false)
 
   reset-error-handler()
+
+
+deftest(gmatrix) gsl-gmatrix-min-max:
+
+  val a = GMatrix(2,2)
+
+  a[0,0] = 1.0
+  a[0,1] = 2.0
+  a[1,0] = 3.0
+  a[1,1] = 4.0
+
+  #EXPECT(maximum(a) == 4.0)
+  #EXPECT(minimum(a) == 1.0)
+
+  val [min, max] = minmax(a)
+  #EXPECT(min == 1.0)
+  #EXPECT(max == 4.0)
+
+  #EXPECT(argmin(a) == [0,0])
+  #EXPECT(argmax(a) == [1,1])
+
+  #EXPECT(argminmax(a) == [[0,0], [1,1]])
