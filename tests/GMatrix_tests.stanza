@@ -274,3 +274,40 @@ deftest(gmatrix) gsl-gmatrix-min-max:
   #EXPECT(argmax(a) == [1,1])
 
   #EXPECT(argminmax(a) == [[0,0], [1,1]])
+
+deftest(gmatrix) gsl-matrix-utils:
+
+  var a = GMatrix(2,2)
+
+  a[0,0] = 1.0
+  a[0,1] = 2.0
+  a[1,0] = 3.0
+  a[1,1] = 4.0
+
+  #EXPECT(not zero?(a))
+  #EXPECT(not negative?(a))
+  #EXPECT(positive?(a))
+  #EXPECT(non-negative?(a))
+
+  a[0,0] = -1.0
+  a[0,1] = 2.0
+  a[1,0] = 3.0
+  a[1,1] = 4.0
+
+  #EXPECT(not zero?(a))
+  #EXPECT(not negative?(a))
+  #EXPECT(not positive?(a))
+  #EXPECT(not non-negative?(a))
+
+  set-zero(a)
+
+  #EXPECT(zero?(a))
+  #EXPECT(not negative?(a))
+  #EXPECT(not positive?(a))
+  #EXPECT(non-negative?(a))
+
+  set-all(a, -1.0)
+  #EXPECT(not zero?(a))
+  #EXPECT(negative?(a))
+  #EXPECT(not positive?(a))
+  #EXPECT(not non-negative?(a))
