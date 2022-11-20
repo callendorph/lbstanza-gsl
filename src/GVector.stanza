@@ -36,7 +36,7 @@ lostanza defmethod run (v:ref<GVectorFinalizer>) -> ref<False> :
   call-c gsl_vector_free(v.value)
   return false
 
-public lostanza deftype GVector <: Unique :
+public lostanza deftype GVector <: Unique & IndexedCollection<Double> :
   value:ptr<?>
   size:int
 
@@ -57,9 +57,16 @@ public lostanza defn GVector (other:ref<GVector>) -> ref<GVector> :
     throw(GSLException(new Int{result}))
   return ret
 
-public lostanza defn get (self:ref<GVector>, index:ref<Int>) -> ref<Double> :
+public lostanza defmethod length (self:ref<GVector>) -> ref<Int> :
+  return new Int{self.size}
+
+public lostanza defn get-val (self:ref<GVector>, index:ref<Int>) -> ref<Double> :
   val ret = call-c gsl_vector_get(self.value, index.value)
   return new Double{ret}
+
+public defmethod get (self:GVector, index:Int) -> Double :
+  get-val(self, index)
+
 
 ; I want to have the ability to get/set vectors with
 ; ranges. There is the concept of a "view" vector for slices like this
@@ -69,9 +76,13 @@ public lostanza defn get (self:ref<GVector>, index:ref<Int>) -> ref<Double> :
 ; public lostanza defn get(self:ref<GVector>, r:Range) -> ref<GVector>
 ;   return new GVector{ptr}
 
-public lostanza defn set (self:ref<GVector>, index:ref<Int>, x:ref<Double>) -> ref<False> :
+public lostanza defn set-val (self:ref<GVector>, index:ref<Int>, x:ref<Double>) -> ref<False> :
   call-c gsl_vector_set(self.value, index.value, x.value)
   return false
+
+public defmethod set (self:GVector, index:Int, x:Double) -> False :
+  set-val(self, index, x)
+
 
 public lostanza defn set-all (self:ref<GVector>, x:ref<Double>) -> ref<False> :
   call-c gsl_vector_set_all(self.value, x.value)
