@@ -2,6 +2,7 @@ defpackage gsl/GMatrix :
   import core
   import gsl/Errors
   import gsl/Utils
+  import gsl/GVector
 
 extern gsl_matrix_alloc : (int,int) -> ptr<?>
 extern gsl_matrix_free : ptr<?> -> int
@@ -37,6 +38,14 @@ extern gsl_matrix_isneg : (ptr<?>) -> int
 extern gsl_matrix_ispos : (ptr<?>) -> int
 extern gsl_matrix_isnonneg : (ptr<?>) -> int
 
+extern gsl_matrix_get_row : (ptr<?>, ptr<?>, int) -> int
+extern gsl_matrix_get_col : (ptr<?>, ptr<?>, int) -> int
+extern gsl_matrix_set_row : (ptr<?>, int, ptr<?>) -> int
+extern gsl_matrix_set_col : (ptr<?>, int, ptr<?>) -> int
+
+extern gsl_matrix_swap_rows : (ptr<?>, int, int) -> int
+extern gsl_matrix_swap_columns : (ptr<?>, int, int) -> int
+extern gsl_matrix_swap_rowcol : (ptr<?>, int, int) -> int
 
 lostanza deftype GMatrixFinalizer <: Finalizer:
   value:ptr<?>
@@ -91,6 +100,50 @@ public lostanza defn rows (self:ref<GMatrix>) -> ref<Int> :
 
 public lostanza defn columns (self:ref<GMatrix>) -> ref<Int> :
   return new Int{self.cols}
+
+public lostanza defn get-row (self:ref<GMatrix>, row:ref<Int>) -> ref<GVector> :
+  val ret = GVector(columns(self))
+  val result = call-c gsl_matrix_get_row(ret.value, self.value, row.value)
+  if result != 0 :
+    throw(GSLException(new Int{result}))
+  return ret
+
+public lostanza defn get-column (self:ref<GMatrix>, col:ref<Int>) -> ref<GVector> :
+  val ret = GVector(rows(self))
+  val result = call-c gsl_matrix_get_col(ret.value, self.value, col.value)
+  if result != 0 :
+    throw(GSLException(new Int{result}))
+  return ret
+
+public lostanza defn set-row (self:ref<GMatrix>, row:ref<Int>, V:ref<GVector>) -> ref<False>:
+  val result = call-c gsl_matrix_set_row(self.value, row.value, V.value)
+  if result != 0 :
+    throw(GSLException(new Int{result}))
+  return false
+
+public lostanza defn set-column (self:ref<GMatrix>, col:ref<Int>, V:ref<GVector>) -> ref<False>:
+  val result = call-c gsl_matrix_set_col(self.value, col.value, V.value)
+  if result != 0 :
+    throw(GSLException(new Int{result}))
+  return false
+
+public lostanza defn swap-rows (self:ref<GMatrix>, i:ref<Int>, j:ref<Int>) -> ref<False>:
+  val result = call-c gsl_matrix_swap_rows(self.value, i.value, j.value)
+  if result != 0 :
+    throw(GSLException(new Int{result}))
+  return false
+
+public lostanza defn swap-columns (self:ref<GMatrix>, i:ref<Int>, j:ref<Int>) -> ref<False>:
+  val result = call-c gsl_matrix_swap_columns(self.value, i.value, j.value)
+  if result != 0 :
+    throw(GSLException(new Int{result}))
+  return false
+
+public lostanza defn swap-row-for-column (self:ref<GMatrix>, i:ref<Int>, j:ref<Int>) -> ref<False>:
+  val result = call-c gsl_matrix_swap_rowcol(self.value, i.value, j.value)
+  if result != 0 :
+    throw(GSLException(new Int{result}))
+  return false
 
 public lostanza defn transpose! (self:ref<GMatrix>) -> ref<False> :
   val result = call-c gsl_matrix_transpose(self.value)
