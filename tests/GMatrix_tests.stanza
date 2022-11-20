@@ -2,6 +2,7 @@
 defpackage gsl/GMatrix/tests :
   import core
   import gsl/GMatrix
+  import gsl/GVector
   import gsl/Errors
 
 #if-defined(TESTING) :
@@ -311,3 +312,149 @@ deftest(gmatrix) gsl-matrix-utils:
   #EXPECT(negative?(a))
   #EXPECT(not positive?(a))
   #EXPECT(not non-negative?(a))
+
+deftest(gmatrix) gsl-matrix-rowcol-vectors:
+
+  var a = GMatrix(3,3)
+  set-identity(a)
+
+  var r2 = get-row(a, 2)
+  #EXPECT(length(r2) == 3)
+  #EXPECT(r2[0] == 0.0)
+  #EXPECT(r2[1] == 0.0)
+  #EXPECT(r2[2] == 1.0)
+
+  var c1 = get-column(a, 1)
+  #EXPECT(length(c1) == 3)
+  #EXPECT(c1[0] == 0.0)
+  #EXPECT(c1[1] == 1.0)
+  #EXPECT(c1[2] == 0.0)
+
+  r2[0] = 10.0
+
+  set-row(a, 2, r2)
+
+  var c0 = get-column(a, 0)
+  #EXPECT(length(c0) == 3)
+  #EXPECT(c0[0] == 1.0)
+  #EXPECT(c0[1] == 0.0)
+  #EXPECT(c0[2] == 10.0)
+
+  c1[2] = -5.0
+
+  set-column(a, 1, c1)
+  r2 = get-row(a, 2)
+  #EXPECT(r2[0] == 10.0)
+  #EXPECT(r2[1] == -5.0)
+  #EXPECT(r2[2] == 1.0)
+
+deftest(gmatrix) gsl-matrix-swap-rows:
+
+  var a = GMatrix(4,4)
+  set-identity(a)
+
+  var r1 = get-row(a, 1)
+  #EXPECT(length(r1) == 4)
+  #EXPECT(r1[0] == 0.0)
+  #EXPECT(r1[1] == 1.0)
+  #EXPECT(r1[2] == 0.0)
+  #EXPECT(r1[3] == 0.0)
+
+
+  var r2 = get-row(a, 2)
+  #EXPECT(length(r2) == 4)
+  #EXPECT(r2[0] == 0.0)
+  #EXPECT(r2[1] == 0.0)
+  #EXPECT(r2[2] == 1.0)
+  #EXPECT(r2[3] == 0.0)
+
+  swap-rows(a, 1, 2)
+
+  r1 = get-row(a, 1)
+  #EXPECT(length(r1) == 4)
+  #EXPECT(r1[0] == 0.0)
+  #EXPECT(r1[1] == 0.0)
+  #EXPECT(r1[2] == 1.0)
+  #EXPECT(r1[3] == 0.0)
+
+  r2 = get-row(a, 2)
+  #EXPECT(length(r2) == 4)
+  #EXPECT(r2[0] == 0.0)
+  #EXPECT(r2[1] == 1.0)
+  #EXPECT(r2[2] == 0.0)
+  #EXPECT(r2[3] == 0.0)
+
+deftest(gmatrix) gsl-matrix-swap-columns:
+
+  var a = GMatrix(4,3)
+  set-identity(a)
+
+  var c1 = get-column(a, 1)
+  #EXPECT(length(c1) == 4)
+  #EXPECT(c1[0] == 0.0)
+  #EXPECT(c1[1] == 1.0)
+  #EXPECT(c1[2] == 0.0)
+  #EXPECT(c1[3] == 0.0)
+
+  var c2 = get-column(a, 2)
+  #EXPECT(length(c2) == 4)
+  #EXPECT(c2[0] == 0.0)
+  #EXPECT(c2[1] == 0.0)
+  #EXPECT(c2[2] == 1.0)
+  #EXPECT(c2[3] == 0.0)
+
+  swap-columns(a, 1, 2)
+
+  c1 = get-column(a, 1)
+  #EXPECT(length(c1) == 4)
+  #EXPECT(c1[0] == 0.0)
+  #EXPECT(c1[1] == 0.0)
+  #EXPECT(c1[2] == 1.0)
+  #EXPECT(c1[3] == 0.0)
+
+  c2 = get-column(a, 2)
+  #EXPECT(length(c2) == 4)
+  #EXPECT(c2[0] == 0.0)
+  #EXPECT(c2[1] == 1.0)
+  #EXPECT(c2[2] == 0.0)
+  #EXPECT(c2[3] == 0.0)
+
+deftest(gmatrix) gsl-matrix-swap-row-for-column:
+
+  var a = GMatrix(4,4)
+  set-identity(a)
+
+  var r = get-row(a,0)
+  #EXPECT(length(r) == 4)
+  #EXPECT(r[0] == 1.0)
+  #EXPECT(r[1] == 0.0)
+  #EXPECT(r[2] == 0.0)
+  #EXPECT(r[3] == 0.0)
+
+  var c = get-column(a, 3)
+  #EXPECT(length(c) == 4)
+  #EXPECT(c[0] == 0.0)
+  #EXPECT(c[1] == 0.0)
+  #EXPECT(c[2] == 0.0)
+  #EXPECT(c[3] == 1.0)
+
+  swap-row-for-column(a, 0, 3)
+
+  r = get-row(a,0)
+  #EXPECT(length(r) == 4)
+  #EXPECT(r[0] == 0.0)
+  #EXPECT(r[1] == 0.0)
+  #EXPECT(r[2] == 0.0)
+  #EXPECT(r[3] == 1.0)
+
+  ; Note that this result isn't totally expected
+  ;   I think it is due to the way that the
+  ;   method works internally to GSL and the order
+  ;   at which the row and column swap are applied.
+  c = get-column(a, 3)
+  #EXPECT(length(c) == 4)
+  #EXPECT(c[0] == 1.0)
+  #EXPECT(c[1] == 0.0)
+  #EXPECT(c[2] == 0.0)
+  #EXPECT(c[3] == 1.0)
+
