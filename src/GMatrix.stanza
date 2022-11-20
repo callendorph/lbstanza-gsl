@@ -75,6 +75,11 @@ public lostanza defn GMatrix (other:ref<GMatrix>) -> ref<GMatrix> :
     throw(GSLException(new Int{result}))
   return ret
 
+public defmethod write (o:OutputStream, x:GMatrix) -> False :
+  print(o, "GMatrix: %_ x %_\n" % [rows(x), columns(x)])
+  for i in 0 to rows(x) do:
+    print(o, "\t%~\n" % [get-row(x, i)])
+
 public lostanza defn get (self:ref<GMatrix>, i:ref<Int>, j:ref<Int>) -> ref<Double> :
   val ret = call-c gsl_matrix_get(self.value, i.value, j.value)
   return new Double{ret}

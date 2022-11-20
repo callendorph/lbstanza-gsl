@@ -51,6 +51,9 @@ deftest(gmatrix) gsl-gmatrix-basic:
   #EXPECT(rows(a) == 2)
   #EXPECT(columns(a) == 2)
 
+  val content = to-string("%~" % [a])
+  #EXPECT(content == "GMatrix: 2 x 2\n\t[2.0, 2.0]\n\t[2.0, 2.0]\n")
+
 deftest(gmatrix) gsl-matrix-transpose:
 
   val a = GMatrix(2,2)
