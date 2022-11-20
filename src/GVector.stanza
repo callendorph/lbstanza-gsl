@@ -37,7 +37,7 @@ lostanza defmethod run (v:ref<GVectorFinalizer>) -> ref<False> :
   call-c gsl_vector_free(v.value)
   return false
 
-public lostanza deftype GVector <: Unique :
+public lostanza deftype GVector <: Unique & Lengthable :
   value:ptr<?>
   size:int
 
@@ -57,6 +57,9 @@ public lostanza defn GVector (other:ref<GVector>) -> ref<GVector> :
   if result != 0 :
     throw(GSLException(new Int{result}))
   return ret
+
+public lostanza defmethod length (self:ref<GVector>) -> ref<Int> :
+  return new Int{self.size}
 
 public lostanza defn get (self:ref<GVector>, index:ref<Int>) -> ref<Double> :
   val ret = call-c gsl_vector_get(self.value, index.value)

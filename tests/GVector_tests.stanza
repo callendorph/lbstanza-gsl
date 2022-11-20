@@ -11,6 +11,8 @@ deftest gsl-gvector-basics :
   uut[1] = -1.0
   uut[2] = 0.0
 
+  #EXPECT(length(uut) == 3)
+
   var obs = uut[0]
   #EXPECT(obs == 10.0)
 
