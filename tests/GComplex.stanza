@@ -1,5 +1,5 @@
 #use-added-syntax(tests)
-defpackage gsl/GComplex/tests :
+defpackage gsl/tests/GComplex :
   import core
   import gsl/GComplex
 
