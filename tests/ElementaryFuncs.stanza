@@ -1,5 +1,5 @@
 #use-added-syntax(tests)
-defpackage gsl/ElementaryFuncs/tests :
+defpackage gsl/tests/ElementaryFuncs :
   import core
   import gsl/ElementaryFuncs
 

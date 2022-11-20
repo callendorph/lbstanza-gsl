@@ -1,5 +1,5 @@
 #use-added-syntax(tests)
-defpackage gsl/GVector/tests :
+defpackage gsl/tests/GVector :
   import core
   import gsl/GVector
 

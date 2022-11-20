@@ -1,5 +1,5 @@
 #use-added-syntax(tests)
-defpackage gsl/Errors/tests :
+defpackage gsl/tests/Errors :
   import core
   import gsl/Errors
   import gsl/ElementaryFuncs

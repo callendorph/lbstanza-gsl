@@ -1,5 +1,5 @@
 #use-added-syntax(tests)
-defpackage gsl/GMatrix/tests :
+defpackage gsl/tests/GMatrix :
   import core
   import gsl/GMatrix
   import gsl/GVector

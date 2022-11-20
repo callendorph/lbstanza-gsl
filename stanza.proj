@@ -37,11 +37,8 @@ package gsl/GMatrix requires :
   ccflags :
     "-I{GSL_INCDIR}"
 
-package gsl/ElementaryFuncs/tests defined-in "tests/ELementaryFuncs_tests.stanza"
-package gsl/GVector/tests defined-in "tests/GVector_tests.stanza"
-package gsl/Errors/tests defined-in "tests/Errors_tests.stanza"
-package gsl/GComplex/tests defined-in "tests/GComplex_tests.stanza"
-package gsl/GMatrix/tests defined-in "tests/GMatrix_tests.stanza"
+
+packages gsl/tests/* defined-in "tests/"
 
 build main :
   inputs:
@@ -53,10 +50,10 @@ build main :
 
 build-test gsl-tests :
   inputs:
-    gsl/ElementaryFuncs/tests
-    gsl/GVector/tests
-    gsl/GComplex/tests
-    gsl/Errors/tests
-    gsl/GMatrix/tests
+    gsl/tests/ElementaryFuncs
+    gsl/tests/GVector
+    gsl/tests/GComplex
+    gsl/tests/Errors
+    gsl/tests/GMatrix
   pkg: "pkgs"
     o: "gsl-tests.exe"
