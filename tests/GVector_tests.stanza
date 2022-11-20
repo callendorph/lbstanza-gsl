@@ -37,6 +37,9 @@ deftest gsl-gvector-basics :
   #EXPECT(uut[1] == 0.0)
   #EXPECT(uut[2] == 1.0)
 
+  val uutStr = to-string("%~" % [uut])
+  #EXPECT(uutStr == "[0.0, 0.0, 1.0]")
+
 deftest gsl-gvector-copy :
   val uut = GVector(3)
 
