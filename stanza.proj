@@ -46,6 +46,7 @@ build main :
     gsl/ElementaryFuncs
     gsl/GVector
     gsl/GComplex
+    gsl/GMatrix
   pkg: "pkgs"
 
 build-test gsl-tests :
