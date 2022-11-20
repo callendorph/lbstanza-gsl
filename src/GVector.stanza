@@ -61,6 +61,12 @@ public lostanza defn GVector (other:ref<GVector>) -> ref<GVector> :
 public lostanza defmethod length (self:ref<GVector>) -> ref<Int> :
   return new Int{self.size}
 
+public defmethod write (o:OutputStream, x:GVector) -> False :
+  val strs = Array<String>(length(x))
+  for i in 0 to length(x) do :
+    strs[i] = to-string("%_" % [x[i]])
+  print(o, "[%,]" % [strs])
+
 public lostanza defn get (self:ref<GVector>, index:ref<Int>) -> ref<Double> :
   val ret = call-c gsl_vector_get(self.value, index.value)
   return new Double{ret}
