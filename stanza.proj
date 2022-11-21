@@ -37,6 +37,12 @@ package gsl/GMatrix requires :
   ccflags :
     "-I{GSL_INCDIR}"
 
+package gsl/GRng requires :
+  ccfiles:
+    "{GSL_LIBDIR}/libgsl.a"
+    "{GSL_LIBDIR}/libgslcblas.a"
+  ccflags :
+    "-I{GSL_INCDIR}"
 
 packages gsl/tests/* defined-in "tests/"
 
@@ -47,6 +53,7 @@ build main :
     gsl/GVector
     gsl/GComplex
     gsl/GMatrix
+    gsl/GRng
   pkg: "pkgs"
 
 build-test gsl-tests :
@@ -56,5 +63,6 @@ build-test gsl-tests :
     gsl/tests/GComplex
     gsl/tests/Errors
     gsl/tests/GMatrix
+    gsl/tests/GRng
   pkg: "pkgs"
     o: "gsl-tests.exe"
