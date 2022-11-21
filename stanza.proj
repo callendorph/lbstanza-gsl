@@ -67,6 +67,15 @@ package gsl/BesselFuncs requires :
   ccflags :
     "-I{GSL_INCDIR}"
 
+package gsl/GPolynomial requires :
+  ccfiles:
+    "src/GPolynomial.c"
+    "{GSL_LIBDIR}/libgsl.a"
+    "{GSL_LIBDIR}/libgslcblas.a"
+  ccflags :
+    "-I{GSL_INCDIR}"
+    "-DGSL_COMPLEX_LEGACY"
+
 
 packages gsl/tests/* defined-in "tests/"
 
@@ -81,6 +90,7 @@ build main :
     gsl/GRng
     gsl/GDistributions
     gsl/BesselFuncs
+    gsl/GPolynomial
   pkg: "pkgs"
 
 build-test gsl-tests :
@@ -94,5 +104,6 @@ build-test gsl-tests :
     gsl/tests/GRng
     gsl/tests/GDistributions
     gsl/tests/BesselFuncs
+    gsl/tests/GPolynomial
   pkg: "pkgs"
     o: "gsl-tests.exe"

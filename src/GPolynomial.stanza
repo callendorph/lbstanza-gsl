@@ -1,0 +1,212 @@
+defpackage gsl/GPolynomial :
+  import core
+  import gsl/GComplex
+  import gsl/Errors
+
+extern gsl_poly_eval : (ptr<double>, int, double) -> double
+extern w_gsl_poly_complex_eval : (ptr<double>, int, ptr<?>, ptr<?>) -> int
+extern w_gsl_complex_poly_complex_eval : (ptr<?>, int, ptr<?>, ptr<?>) -> int
+extern gsl_poly_eval_derivs : (ptr<double>, int, double, ptr<double>, int) -> int
+
+extern gsl_poly_solve_quadratic : (double, double, double, ptr<double>, ptr<double>) -> int
+extern gsl_poly_complex_solve_quadratic : (double, double, double, ptr<double>, ptr<double>) -> int
+extern gsl_poly_solve_cubic : (double, double, double, ptr<double>, ptr<double>, ptr<double>) -> int
+extern gsl_poly_complex_solve_cubic : (double, double, double, ptr<double>, ptr<double>, ptr<double>) -> int
+
+extern gsl_poly_complex_workspace_alloc : (int) -> ptr<?>
+extern gsl_poly_complex_workspace_free : (ptr<?>) -> int
+extern gsl_poly_complex_solve : (ptr<double>, int, ptr<?>, ptr<double>) -> int
+
+lostanza deftype GPolyFinalizer <: Finalizer :
+  raw:ptr<?>
+  solve-ws:ptr<?>
+
+lostanza defmethod run (v:ref<GPolyFinalizer>) -> ref<False> :
+  call-c clib/free(v.raw)
+  call-c gsl_poly_complex_workspace_free(v.solve-ws)
+  return false
+
+public lostanza deftype GPolynomial<T> <: Unique & Lengthable :
+  ; We will store the N coefficients in this memory buffer
+  ;  as a raw array of doubles.
+  ;  For real type polynomials, this will be length N
+  ;  For complex type polynomials, this will be length 2N
+  raw:ptr<double>
+  size:int
+  ; Passed coefficients by the user - we unpack these at
+  ;  construction time.
+  coeffs:ref<Tuple<T>>
+  ; This pointer is allocated lazily for solving the
+  ;   complex roots of a real-polynomial.
+  solve-ws:ptr<?>
+
+lostanza defn elem-size (C:ref<Tuple<Double>>) -> int :
+  return sizeof(double) as int
+
+lostanza defn elem-size (C:ref<Tuple<GComplex>>) -> int :
+  return 2 * sizeof(double) as int
+
+lostanza defn write-buf (C:ref<Tuple<Double>>, P:ref<GPolynomial<Double>>) -> ref<Int> :
+  for (var i:int = 0, i < P.size, i = i + 1) :
+    val x = C.items[i]
+    P.raw[i] = x.value
+  return new Int{0}
+
+lostanza defn write-buf (C:ref<Tuple<GComplex>>, P:ref<GPolynomial<GComplex>>) -> ref<Int> :
+  for (var i:int = 0, i < P.size, i = i + 1) :
+    val z = C.items[i]
+    P.raw[2 * i] = z.x
+    P.raw[2 * i + 1] = z.y
+  return new Int{0}
+
+#for TYPE in [Double GComplex] :
+  public lostanza defn GPolynomial (C:ref<Tuple<TYPE>>) -> ref<GPolynomial<TYPE>> :
+    val N:int = length(C).value
+    if N <= 0 :
+      fatal("Invalid Coefficients Argument - Expects Tuple Len > 0")
+
+    val sizeT = elem-size(C)
+
+    val buf = call-c clib/malloc( N * sizeT ) as ptr<double>
+    if buf == null :
+      fatal("Failed to allocate memory buffer for GPolynomial Coeffs")
+
+    ; @NOTE - I was hoping I could do this lazily but I ran into
+    ;   trouble attempting to assign to `self.solve-ws` in later methods.
+    ;   So I'm allocating here for now and we can re-address in the future.
+    val solve-ws = call-c gsl_poly_complex_workspace_alloc(N)
+    if solve-ws == null :
+      throw(GSLException(gsl-ENOMEM()))
+
+    val ret = new GPolynomial<TYPE>{buf, N, C, solve-ws}
+    write-buf(C, ret)
+
+    add-finalizer(new GPolyFinalizer{buf, solve-ws}, ret)
+
+    return ret
+
+public lostanza defn coeffs<?T> (self:ref<GPolynomial<?T>>) -> ref<Tuple<T>> :
+  return self.coeffs
+
+defn to-poly-str<?T> (v:?T, order:Int) -> String :
+  if order == 0 :
+    to-string("%_" % [v])
+  else if order == 1 :
+    to-string("%_ * x" % [v])
+  else:
+    to-string("%_ * x^%_" % [v, order])
+
+public defmethod print<?T> (o:OutputStream, x:GPolynomial<?T>) :
+  val c = coeffs(x)
+  val compStrs = to-tuple $ for i in 0 to length(c) seq:
+    to-poly-str(c[i], i)
+
+  val polyStr = string-join(compStrs, " + ")
+  print(o, polyStr)
+
+public lostanza defn eval (self:ref<GPolynomial<Double>>, x:ref<Double>) -> ref<Double> :
+  val ret = call-c gsl_poly_eval(self.raw, self.size, x.value)
+  return new Double{ret}
+
+public lostanza defn eval (self:ref<GPolynomial<Double>>, z:ref<GComplex>) -> ref<GComplex> :
+  ; Special function that allows evaluating a real-coefficient polynomial at a complex x.
+  val ret = GComplex()
+  call-c w_gsl_poly_complex_eval(self.raw, self.size, addr!(z.x), addr!(ret.x))
+  return ret
+
+lostanza defn to-complex-tuple (result:ptr<double>, numComplex:int) -> ref<Tuple<GComplex>> :
+  val ret = core/void-tuple(numComplex)
+  for (var i:int = 0, i < numComplex, i = i + 1) :
+    ret.items[i] = GComplex(result[2 * i], result[2 * i + 1])
+  return ret
+
+lostanza defn general-solve (self:ref<GPolynomial<Double>>) -> ref<Tuple<GComplex>> :
+  ; Find the Complex Roots of a Polynomial.
+  val numCoeffs = length(self.coeffs).value
+  ; Allocate a buffer for the complex results.
+  val numRoots = numCoeffs - 1
+  val buf = call-c clib/malloc( 2 * sizeof(double) * numRoots ) as ptr<double>
+  if buf == null :
+    throw(GSLException(gsl-ENOMEM()))
+
+  val code = call-c gsl_poly_complex_solve(self.raw, self.size, self.solve-ws, buf)
+  val ret = to-complex-tuple(buf, numRoots)
+  call-c clib/free(buf)
+
+  if code != 0:
+    throw(GSLException(new Int{code}))
+
+  return ret
+
+public lostanza defn solve (self:ref<GPolynomial<Double>>) -> ref<Tuple<GComplex>> :
+  val C = coeffs(self)
+  if length(C).value == 3 :
+    ;  Quadratic - Speed up
+    val ret = solve-quadratic-complex(C.items[2], C.items[1], C.items[0])
+    return ret as ref<Tuple<GComplex>>
+  else:
+    return general-solve(self)
+
+public lostanza defn eval (self:ref<GPolynomial<GComplex>>, x:ref<Double>) -> ref<GComplex> :
+  val z = GComplex(x)
+  return eval(self, z)
+
+public lostanza defn eval (self:ref<GPolynomial<GComplex>>, z:ref<GComplex>) -> ref<GComplex> :
+  val ret = GComplex()
+  call-c w_gsl_complex_poly_complex_eval(self.raw, self.size, addr!(z.x), addr!(ret.x))
+  return ret
+
+lostanza defn to-tuple (result:ptr<double>, lenres:int) -> ref<Tuple<Double>> :
+  val ret = core/void-tuple(lenres)
+  for (var i:int = 0, i < lenres, i = i + 1) :
+    ret.items[i] = new Double{result[i]}
+  return ret
+
+public lostanza defn derivs (self:ref<GPolynomial<Double>>, x:ref<Double>) -> ref<Tuple<Double>> :
+  ; Create a buffer for the derivaties
+  ; Evaluate the poly and its derivatives and returning a tuple of length N+1 where
+  ;  N is the highest order of the polynomial.
+  val bufLen = length(self.coeffs)
+  val buf = call-c clib/malloc( bufLen.value * sizeof(double) ) as ptr<double>
+  if buf == null :
+    throw(GSLException(gsl-ENOMEM()))
+
+  val code = call-c gsl_poly_eval_derivs(self.raw, self.size, x.value, buf, bufLen.value)
+  val ret = to-tuple(buf, bufLen.value)
+  call-c clib/free(buf)
+
+  if code != 0:
+    throw(GSLException(new Int{code}))
+
+  return ret
+
+; Root Finding
+
+public lostanza defn solve-quadratic-real (a:ref<Double>, b:ref<Double>, c:ref<Double>) -> ref<Tuple<Double>> :
+  ; Solves the quadratic and returns real roots
+  ;   This function throws if the roots are complex.
+  val buf = call-c clib/malloc( 2 * sizeof(double) ) as ptr<double>
+  if buf == null :
+    throw(GSLException(gsl-ENOMEM()))
+  val roots = call-c gsl_poly_solve_quadratic(a.value, b.value, c.value, addr!(buf[0]), addr!(buf[1]))
+  val ret = to-tuple(buf, roots)
+  call-c clib/free(buf)
+
+  return ret
+
+public lostanza defn solve-quadratic-complex (a:ref<Double>, b:ref<Double>, c:ref<Double>) -> ref<Tuple<GComplex>> :
+  ; Solves the quadratic and returns real roots
+  ;   This function throws if the roots are complex.
+  val x0 = GComplex()
+  val x1 = GComplex()
+
+  val roots = call-c gsl_poly_complex_solve_quadratic(a.value, b.value, c.value, addr!(x0.x), addr!(x1.x))
+
+  val ret = core/void-tuple(roots)
+  if roots > 0 :
+    ret.items[0] = x0
+  if roots > 1 :
+    ret.items[1] = x1
+
+  return ret as ref<[GComplex, GComplex]>
+

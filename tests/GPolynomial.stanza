@@ -1,0 +1,93 @@
+#use-added-syntax(tests)
+defpackage gsl/tests/GPolynomial :
+  import core
+  import gsl/GPolynomial
+  import gsl/GComplex
+
+val epsilon = 1.0e-3
+#if-defined(TESTING) :
+  defn almost-equal (obs, exp) -> True|False :
+    abs(obs - exp) < epsilon
+
+
+deftest(gpolynomial) gsl-gpoly-real :
+  val uut = GPolynomial([1.0, 2.0, 3.0])
+  val y = eval(uut, 1.0)
+  #EXPECT( y == 6.0 )
+
+  val polyStr = to-string("%~" % [uut])
+  #EXPECT(polyStr == "1.0 + 2.0 * x + 3.0 * x^2")
+
+  val c = GComplex(1.0, -1.0)
+
+  val yc = eval(uut, c)
+  #EXPECT(yc == GComplex(3.0, -8.0))
+
+
+deftest(gpolynomial) gsl-gpoly-complex :
+  val uut = GPolynomial([GComplex(1.0, -1.0), GComplex(0.5,-2.0), GComplex(0.1,0.0)])
+  val y = eval(uut, 1.0)
+  #EXPECT( y == GComplex(1.6,-3.0) )
+
+  val polyStr = to-string("%~" % [uut])
+  #EXPECT(polyStr == "(1.0-1.0i) + (0.5-2.0i) * x + (0.1+0.0i) * x^2")
+
+  val c = GComplex(1.0, -1.0)
+
+  val yc = eval(uut, c)
+  #EXPECT(yc == GComplex(-0.5, -3.7))
+
+deftest(gpolynomial) gsl-gpoly-real-derivs :
+
+  val uut = GPolynomial([1.0, 2.0, 3.0])
+  val y = eval(uut, 1.0)
+  #EXPECT( y == 6.0 )
+
+  #EXPECT(derivs(uut, 1.0) == [6.0, 8.0, 6.0])
+
+deftest(gpolynomial) gsl-gpoly-real-solve :
+
+  var result = solve-quadratic-real(1.0,-5.0,6.0)
+  #EXPECT(result == [2.0, 3.0])
+
+  result = solve-quadratic-real(1.0,1.0,3.0)
+  #EXPECT(result == [])
+
+  result = solve-quadratic-real(1.0,-2.0,1.0)
+  #EXPECT(result == [1.0, 1.0])
+
+
+deftest(gpolynomial) gsl-gpoly-complex-solve :
+
+  var result = solve-quadratic-complex(1.0,-5.0,6.0)
+
+  #EXPECT(length(result) == 2)
+  #EXPECT(result[0] == GComplex(2.0))
+  #EXPECT(result[1] == GComplex(3.0))
+
+  result = solve-quadratic-complex(1.0,2.0,2.0)
+
+  #EXPECT(length(result) == 2)
+  #EXPECT(result[0] == GComplex(-1.0, -1.0))
+  #EXPECT(result[1] == GComplex(-1.0, 1.0))
+
+
+  ; General Purpose solve
+  var uut = GPolynomial([6.0,-5.0,1.0])
+  ; Should shortcut to use quadratic solve.
+  result = solve(uut)
+  #EXPECT(length(result) == 2)
+  #EXPECT(result[0] == GComplex(2.0))
+  #EXPECT(result[1] == GComplex(3.0))
+
+  uut = GPolynomial([1.0, 2.0, 3.0, 4.0])
+  result = solve(uut)
+
+  #EXPECT(length(result) == 3)
+  #EXPECT(almost-equal(real(result[0]), -0.60583))
+  #EXPECT(almost-equal(imag(result[0]), 0.0))
+  #EXPECT(almost-equal(real(result[1]), -0.07209))
+  #EXPECT(almost-equal(imag(result[1]), 0.63833))
+  #EXPECT(almost-equal(real(result[2]), -0.07209))
+  #EXPECT(almost-equal(imag(result[2]), -0.63833))
+
