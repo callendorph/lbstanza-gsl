@@ -1,0 +1,215 @@
+defpackage gsl/GRng :
+  import core
+  import gsl/Errors
+
+; GSL RNG Types
+
+extern gsl_rng_default : ptr<?>
+
+extern gsl_rng_borosh13 : ptr<?>
+extern gsl_rng_coveyou : ptr<?>
+extern gsl_rng_cmrg : ptr<?>
+extern gsl_rng_fishman18 : ptr<?>
+extern gsl_rng_fishman20 : ptr<?>
+extern gsl_rng_fishman2x : ptr<?>
+extern gsl_rng_gfsr4 : ptr<?>
+extern gsl_rng_knuthran : ptr<?>
+extern gsl_rng_knuthran2 : ptr<?>
+extern gsl_rng_knuthran2002 : ptr<?>
+extern gsl_rng_lecuyer21 : ptr<?>
+extern gsl_rng_minstd : ptr<?>
+extern gsl_rng_mrg : ptr<?>
+extern gsl_rng_mt19937 : ptr<?>
+extern gsl_rng_mt19937_1999 : ptr<?>
+extern gsl_rng_mt19937_1998 : ptr<?>
+extern gsl_rng_r250 : ptr<?>
+extern gsl_rng_ran0 : ptr<?>
+extern gsl_rng_ran1 : ptr<?>
+extern gsl_rng_ran2 : ptr<?>
+extern gsl_rng_ran3 : ptr<?>
+extern gsl_rng_rand : ptr<?>
+extern gsl_rng_rand48 : ptr<?>
+extern gsl_rng_random128_bsd : ptr<?>
+extern gsl_rng_random128_glibc2 : ptr<?>
+extern gsl_rng_random128_libc5 : ptr<?>
+extern gsl_rng_random256_bsd : ptr<?>
+extern gsl_rng_random256_glibc2 : ptr<?>
+extern gsl_rng_random256_libc5 : ptr<?>
+extern gsl_rng_random32_bsd : ptr<?>
+extern gsl_rng_random32_glibc2 : ptr<?>
+extern gsl_rng_random32_libc5 : ptr<?>
+extern gsl_rng_random64_bsd : ptr<?>
+extern gsl_rng_random64_glibc2 : ptr<?>
+extern gsl_rng_random64_libc5 : ptr<?>
+extern gsl_rng_random8_bsd : ptr<?>
+extern gsl_rng_random8_glibc2 : ptr<?>
+extern gsl_rng_random8_libc5 : ptr<?>
+extern gsl_rng_random_bsd : ptr<?>
+extern gsl_rng_random_glibc2 : ptr<?>
+extern gsl_rng_random_libc5 : ptr<?>
+extern gsl_rng_randu : ptr<?>
+extern gsl_rng_ranf : ptr<?>
+extern gsl_rng_ranlux : ptr<?>
+extern gsl_rng_ranlux389 : ptr<?>
+extern gsl_rng_ranlxd1 : ptr<?>
+extern gsl_rng_ranlxd2 : ptr<?>
+extern gsl_rng_ranlxs0 : ptr<?>
+extern gsl_rng_ranlxs1 : ptr<?>
+extern gsl_rng_ranlxs2 : ptr<?>
+extern gsl_rng_ranmar : ptr<?>
+extern gsl_rng_slatec : ptr<?>
+extern gsl_rng_taus : ptr<?>
+extern gsl_rng_taus2 : ptr<?>
+extern gsl_rng_taus113 : ptr<?>
+extern gsl_rng_transputer : ptr<?>
+extern gsl_rng_tt800 : ptr<?>
+extern gsl_rng_uni : ptr<?>
+extern gsl_rng_uni32 : ptr<?>
+extern gsl_rng_vax : ptr<?>
+extern gsl_rng_waterman14 : ptr<?>
+extern gsl_rng_zuf : ptr<?>
+
+extern gsl_rng_env_setup : () -> ptr<?>
+
+public lostanza deftype GRandNumGenType :
+  value : ptr<?>
+
+public lostanza defn GRng-env-setup () -> ref<GRandNumGenType> :
+  val defRng = call-c gsl_rng_env_setup()
+  return new GRandNumGenType{defRng}
+
+public lostanza defn default-rng () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_default}
+public lostanza defn borosh13 () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_borosh13}
+public lostanza defn coveyou () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_coveyou}
+public lostanza defn cmrg () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_cmrg}
+public lostanza defn fishman18 () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_fishman18}
+public lostanza defn fishman20 () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_fishman20}
+public lostanza defn fishman2x () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_fishman2x}
+public lostanza defn gfsr4 () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_gfsr4}
+public lostanza defn knuthran () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_knuthran}
+public lostanza defn knuthran2 () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_knuthran2}
+public lostanza defn knuthran2002 () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_knuthran2002}
+public lostanza defn lecuyer21 () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_lecuyer21}
+public lostanza defn minstd () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_minstd}
+public lostanza defn mrg () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_mrg}
+public lostanza defn mt19937 () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_mt19937}
+public lostanza defn mt19937_1999 () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_mt19937_1999}
+public lostanza defn mt19937_1998 () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_mt19937_1998}
+public lostanza defn r250 () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_r250}
+public lostanza defn ran0 () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_ran0}
+public lostanza defn ran1 () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_ran1}
+public lostanza defn ran2 () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_ran2}
+public lostanza defn ran3 () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_ran3}
+public lostanza defn rand () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_rand}
+public lostanza defn rand48 () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_rand48}
+public lostanza defn random128_bsd () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_random128_bsd}
+public lostanza defn random128_glibc2 () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_random128_glibc2}
+public lostanza defn random128_libc5 () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_random128_libc5}
+public lostanza defn random256_bsd () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_random256_bsd}
+public lostanza defn random256_glibc2 () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_random256_glibc2}
+public lostanza defn random256_libc5 () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_random256_libc5}
+public lostanza defn random32_bsd () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_random32_bsd}
+public lostanza defn random32_glibc2 () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_random32_glibc2}
+public lostanza defn random32_libc5 () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_random32_libc5}
+public lostanza defn random64_bsd () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_random64_bsd}
+public lostanza defn random64_glibc2 () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_random64_glibc2}
+public lostanza defn random64_libc5 () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_random64_libc5}
+public lostanza defn random8_bsd () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_random8_bsd}
+public lostanza defn random8_glibc2 () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_random8_glibc2}
+public lostanza defn random8_libc5 () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_random8_libc5}
+public lostanza defn random_bsd () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_random_bsd}
+public lostanza defn random_glibc2 () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_random_glibc2}
+public lostanza defn random_libc5 () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_random_libc5}
+public lostanza defn randu () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_randu}
+public lostanza defn ranf () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_ranf}
+public lostanza defn ranlux () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_ranlux}
+public lostanza defn ranlux389 () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_ranlux389}
+public lostanza defn ranlxd1 () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_ranlxd1}
+public lostanza defn ranlxd2 () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_ranlxd2}
+public lostanza defn ranlxs0 () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_ranlxs0}
+public lostanza defn ranlxs1 () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_ranlxs1}
+public lostanza defn ranlxs2 () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_ranlxs2}
+public lostanza defn ranmar () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_ranmar}
+public lostanza defn slatec () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_slatec}
+public lostanza defn taus () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_taus}
+public lostanza defn taus2 () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_taus2}
+public lostanza defn taus113 () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_taus113}
+public lostanza defn transputer () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_transputer}
+public lostanza defn tt800 () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_tt800}
+public lostanza defn uni () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_uni}
+public lostanza defn uni32 () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_uni32}
+public lostanza defn vax () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_vax}
+public lostanza defn waterman14 () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_waterman14}
+public lostanza defn zuf () -> ref<GRandNumGenType> : return new GRandNumGenType{gsl_rng_zuf}
+
+
+extern gsl_rng_alloc : (ptr<?>) -> ptr<?>
+extern gsl_rng_free : (ptr<?>) -> int
+extern gsl_rng_set : (ptr<?>, long) -> int
+extern gsl_rng_get : (ptr<?>) -> long
+extern gsl_rng_uniform : (ptr<?>) -> double
+extern gsl_rng_uniform_pos : (ptr<?>) -> double
+extern gsl_rng_uniform_int : (ptr<?>, long) -> long
+extern gsl_rng_name : (ptr<?>) -> ptr<byte>
+extern gsl_rng_max : (ptr<?>) -> long
+extern gsl_rng_min : (ptr<?>) -> long
+extern gsl_rng_clone : (ptr<?>) -> ptr<?>
+
+lostanza deftype GRngFinalizer <: Finalizer :
+  value:ptr<?>
+
+lostanza defmethod run (r:ref<GRngFinalizer>) -> ref<False> :
+  call-c gsl_rng_free(r.value)
+  return false
+
+public lostanza deftype GRng <: Unique :
+  value : ptr<?>
+
+public lostanza defn GRng (T:ref<GRandNumGenType>) -> ref<GRng> :
+  val pRng:ptr<?> = call-c gsl_rng_alloc(T.value)
+  if pRng == null :
+    throw(GSLException(gsl-ENOMEM()))
+  val ret = new GRng{pRng}
+  add-finalizer(new GRngFinalizer{pRng}, ret)
+  return ret
+
+public lostanza defn GRng (other:ref<GRng>) -> ref<GRng> :
+  val pRng:ptr<?> = call-c gsl_rng_clone(other.value)
+  if pRng == null :
+    throw(GSLException(gsl-ENOMEM()))
+  val ret = new GRng{pRng}
+  add-finalizer(new GRngFinalizer{pRng}, ret)
+  return ret
+
+public lostanza defn seed (r:ref<GRng>, v:ref<Long>) -> ref<False> :
+  call-c gsl_rng_set(r.value, v.value)
+  return false
+
+public lostanza defn raw-sample (r:ref<GRng>) -> ref<Long> :
+  val ret = call-c gsl_rng_get(r.value)
+  return new Long{ret}
+
+public lostanza defn uniform (r:ref<GRng>) -> ref<Double> :
+  val ret = call-c gsl_rng_uniform(r.value)
+  return new Double{ret}
+
+public lostanza defn uniform-pos (r:ref<GRng>) -> ref<Double> :
+  val ret = call-c gsl_rng_uniform_pos(r.value)
+  return new Double{ret}
+
+public lostanza defn uniform-int (r:ref<GRng>, domain:ref<Long>) -> ref<Long> :
+  val ret = call-c gsl_rng_uniform_int(r.value, domain.value)
+  return new Long{ret}
+
+public lostanza defn name (r:ref<GRng>) -> ref<String> :
+  val ret = call-c gsl_rng_name(r.value)
+  return String(ret)
+
+public lostanza defn max-value (r:ref<GRng>) -> ref<Long> :
+  val ret = call-c gsl_rng_max(r.value)
+  return new Long{ret}
+
+public lostanza defn min-value (r:ref<GRng>) -> ref<Long> :
+  val ret = call-c gsl_rng_min(r.value)
+  return new Long{ret}
+

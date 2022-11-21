@@ -1,0 +1,46 @@
+#use-added-syntax(tests)
+defpackage gsl/tests/GRng :
+  import core
+  import gsl/GRng
+
+val epsilon = 1.0e-6
+#if-defined(TESTING) :
+  defn almost-equal (obs, exp) -> True|False :
+    abs(obs - exp) < epsilon
+
+
+deftest(grng) gsl-grng-basics :
+
+  val defRng = GRng-env-setup()
+
+  val uut = GRng(taus())
+
+  val name = name(uut)
+  #EXPECT(name == "taus")
+
+  seed(uut, 1L)
+
+  val obs = raw-sample(uut)
+  #EXPECT( obs == 802792108L)
+  val obs2 = uniform(uut)
+  #EXPECT( almost-equal(obs2, 0.951039797859266))
+
+  val obs3 = uniform-pos(uut)
+  #EXPECT( almost-equal(obs3,  0.545435771113262))
+  val obs4 = uniform-int(uut, 200L)
+  #EXPECT( obs4 == 14L)
+
+  val minVal = min-value(uut)
+  #EXPECT(minVal == 0L)
+  val maxVal = max-value(uut)
+  #EXPECT(maxVal == 4294967295L)
+
+  ; Clone the RNG and then confirm that the
+  ;   next values out of both the uut and the clone are the same
+
+  val uut2 = GRng(uut)
+
+  val smpOrig = raw-sample(uut)
+  val smpClone = raw-sample(uut2)
+
+  #EXPECT(smpOrig == smpClone)
