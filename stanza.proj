@@ -44,6 +44,14 @@ package gsl/GRng requires :
   ccflags :
     "-I{GSL_INCDIR}"
 
+package gsl/GDistributions requires :
+  ccfiles:
+    "{GSL_LIBDIR}/libgsl.a"
+    "{GSL_LIBDIR}/libgslcblas.a"
+  ccflags :
+    "-I{GSL_INCDIR}"
+
+
 packages gsl/tests/* defined-in "tests/"
 
 build main :
@@ -54,6 +62,7 @@ build main :
     gsl/GComplex
     gsl/GMatrix
     gsl/GRng
+    gsl/GDistributions
   pkg: "pkgs"
 
 build-test gsl-tests :
@@ -64,5 +73,6 @@ build-test gsl-tests :
     gsl/tests/Errors
     gsl/tests/GMatrix
     gsl/tests/GRng
+    gsl/tests/GDistributions
   pkg: "pkgs"
     o: "gsl-tests.exe"
