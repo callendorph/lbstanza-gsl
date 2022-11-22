@@ -1,0 +1,151 @@
+defpackage gsl/GDistributions :
+  import core
+  import gsl/Errors
+  import gsl/GRng
+
+; Gaussian
+extern gsl_ran_gaussian : (ptr<?>, double) -> double
+extern gsl_ran_gaussian_pdf : (double, double) -> double
+
+extern gsl_ran_gaussian_ziggurat : (ptr<?>, double) -> double
+extern gsl_ran_gaussian_ratio_method : (ptr<?>, double) -> double
+
+extern gsl_cdf_gaussian_P : (double, double) -> double
+extern gsl_cdf_gaussian_Q : (double, double) -> double
+extern gsl_cdf_gaussian_Pinv : (double, double) -> double
+extern gsl_cdf_gaussian_Qinv : (double, double) -> double
+
+; Gaussian Tail
+extern gsl_ran_gaussian_tail : (ptr<?>, double, double) -> double
+extern gsl_ran_gaussian_tail_pdf : (double, double, double) -> double
+
+; Weibull
+extern gsl_ran_weibull : (ptr<?>, double, double) -> double
+extern gsl_ran_weibull_pdf : (double, double, double) -> double
+
+extern gsl_cdf_weibull_P : (double, double, double) -> double
+extern gsl_cdf_weibull_Q : (double, double, double) -> double
+extern gsl_cdf_weibull_Pinv : (double, double, double) -> double
+extern gsl_cdf_weibull_Qinv : (double, double, double) -> double
+
+public deftype GDistribution
+
+; Required Methods
+public defmulti sample (self:GDistribution, rng:GRng) -> Double
+public defmulti pdf (self:GDistribution, x:Double) -> Double
+; The following methods may not be defined for every
+;  distribution type.
+public defmulti cdf-P (self:GDistribution, x:Double) -> Double
+public defmulti cdf-Q (self:GDistribution, x:Double) -> Double
+public defmulti cdf-P-inverse (self:GDistribution, P:Double) -> Double
+public defmulti cdf-Q-inverse (self:GDistribution, Q:Double) -> Double
+
+
+; Gaussian Distribution
+
+public lostanza deftype Gaussian <: GDistribution :
+  sigma: double
+
+public lostanza defn Gaussian (sigma:ref<Double>) -> ref<Gaussian> :
+  val ret = new Gaussian{sigma.value}
+  return ret
+
+public lostanza defn sigma (self:ref<Gaussian>) -> ref<Double> :
+  return new Double{self.sigma}
+
+public lostanza defmethod sample (self:ref<Gaussian>, rng:ref<GRng>) -> ref<Double> :
+  val ret = call-c gsl_ran_gaussian(rng.value, self.sigma)
+  return new Double{ret}
+
+public lostanza defn sample-ziggurat (self:ref<Gaussian>, rng:ref<GRng>) -> ref<Double> :
+  val ret = call-c gsl_ran_gaussian_ziggurat(rng.value, self.sigma)
+  return new Double{ret}
+
+public lostanza defn sample-ratio-method (self:ref<Gaussian>, rng:ref<GRng>) -> ref<Double> :
+  val ret = call-c gsl_ran_gaussian_ratio_method(rng.value, self.sigma)
+  return new Double{ret}
+
+public lostanza defmethod pdf (self:ref<Gaussian>, x:ref<Double>) -> ref<Double> :
+  val ret = call-c gsl_ran_gaussian_pdf(x.value, self.sigma)
+  return new Double{ret}
+
+public lostanza defmethod cdf-P (self:ref<Gaussian>, x:ref<Double>) -> ref<Double> :
+  val ret = call-c gsl_cdf_gaussian_P(x.value, self.sigma)
+  return new Double{ret}
+
+public lostanza defmethod cdf-Q (self:ref<Gaussian>, x:ref<Double>) -> ref<Double> :
+  val ret = call-c gsl_cdf_gaussian_Q(x.value, self.sigma)
+  return new Double{ret}
+
+public lostanza defmethod cdf-P-inverse (self:ref<Gaussian>, P:ref<Double>) -> ref<Double> :
+  val ret = call-c gsl_cdf_gaussian_Pinv(P.value, self.sigma)
+  return new Double{ret}
+
+public lostanza defmethod cdf-Q-inverse (self:ref<Gaussian>, Q:ref<Double>) -> ref<Double> :
+  val ret = call-c gsl_cdf_gaussian_Qinv(Q.value, self.sigma)
+  return new Double{ret}
+
+; Gaussian Tail Distribution
+
+public lostanza deftype GaussianTail <: GDistribution :
+  a : double
+  sigma: double
+
+public lostanza defn GaussianTail (a:ref<Double>, sigma:ref<Double>) -> ref<GaussianTail> :
+  val ret = new GaussianTail{a.value, sigma.value}
+  return ret
+
+public lostanza defn threshold (self:ref<GaussianTail>) -> ref<Double> :
+  return new Double{self.a}
+
+public lostanza defn sigma (self:ref<GaussianTail>) -> ref<Double> :
+  return new Double{self.sigma}
+
+public lostanza defmethod sample (self:ref<GaussianTail>, rng:ref<GRng>) -> ref<Double> :
+  val ret = call-c gsl_ran_gaussian_tail(rng.value, self.a, self.sigma)
+  return new Double{ret}
+
+public lostanza defmethod pdf (self:ref<GaussianTail>, x:ref<Double>) -> ref<Double> :
+  val ret = call-c gsl_ran_gaussian_tail_pdf(x.value, self.a, self.sigma)
+  return new Double{ret}
+
+; Weibull Distribution
+
+public lostanza deftype Weibull <: GDistribution :
+  a: double
+  b: double
+
+public lostanza defn Weibull (a:ref<Double>, b:ref<Double>) -> ref<Weibull> :
+  val ret = new Weibull{a.value, b.value}
+  return ret
+
+public lostanza defn alpha (self:ref<Weibull>) -> ref<Double> :
+  return new Double{self.a}
+
+public lostanza defn beta (self:ref<Weibull>) -> ref<Double> :
+  return new Double{self.b}
+
+public lostanza defmethod sample (self:ref<Weibull>, rng:ref<GRng>) -> ref<Double> :
+  val ret = call-c gsl_ran_weibull(rng.value, self.a, self.b)
+  return new Double{ret}
+
+public lostanza defmethod pdf (self:ref<Weibull>, x:ref<Double>) -> ref<Double> :
+  val ret = call-c gsl_ran_weibull_pdf(x.value, self.a, self.b)
+  return new Double{ret}
+
+public lostanza defmethod cdf-P (self:ref<Weibull>, x:ref<Double>) -> ref<Double> :
+  val ret = call-c gsl_cdf_weibull_P(x.value, self.a, self.b)
+  return new Double{ret}
+
+public lostanza defmethod cdf-Q (self:ref<Weibull>, x:ref<Double>) -> ref<Double> :
+  val ret = call-c gsl_cdf_weibull_Q(x.value, self.a, self.b)
+  return new Double{ret}
+
+public lostanza defmethod cdf-P-inverse (self:ref<Weibull>, P:ref<Double>) -> ref<Double> :
+  val ret = call-c gsl_cdf_weibull_Pinv(P.value, self.a, self.b)
+  return new Double{ret}
+
+public lostanza defmethod cdf-Q-inverse (self:ref<Weibull>, Q:ref<Double>) -> ref<Double> :
+  val ret = call-c gsl_cdf_weibull_Qinv(Q.value, self.a, self.b)
+  return new Double{ret}
+

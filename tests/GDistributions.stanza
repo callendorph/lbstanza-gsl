@@ -1,0 +1,53 @@
+#use-added-syntax(tests)
+defpackage gsl/tests/GDistributions :
+  import core
+  import gsl/GDistributions
+  import gsl/GRng
+
+val epsilon = 1.0e-6
+#if-defined(TESTING) :
+  defn almost-equal (obs, exp) -> True|False :
+    abs(obs - exp) < epsilon
+
+deftest(gdistribution) gsl-gdistribution-gaussian :
+
+  val G = Gaussian(1.0)
+  val rng = GRng(taus())
+  seed(rng, 1L)
+
+  var x = sample(G, rng)
+  #EXPECT(almost-equal(x, -0.785386422684677))
+  var p = pdf(G, 0.5)
+  #EXPECT(almost-equal(p, 0.352065326764))
+  var cP = cdf-P(G, 0.5)
+  #EXPECT(almost-equal(cP, 0.691462461274013) )
+  var cQ = cdf-Q(G, 0.5)
+  #EXPECT(almost-equal(cQ, 0.308537538725987))
+
+deftest(gdistribution) gsl-gdistribution-gaussian-tail :
+  val G = GaussianTail(0.5, 1.0)
+  val rng = GRng(taus())
+  seed(rng, 1L)
+
+  var x = sample(G, rng)
+  #EXPECT(almost-equal(x, 1.11053712041106))
+  var p = pdf(G, 0.2)
+  #EXPECT(almost-equal(p, 0.0))
+
+  p = pdf(G, 0.7)
+  #EXPECT(almost-equal(p, 1.01204519442308))
+
+deftest(gdistribution) gsl-gdistribution-weibull :
+
+  val G = Weibull(1.0, 2.0)
+  val rng = GRng(taus())
+  seed(rng, 1L)
+
+  var x = sample(G, rng)
+  #EXPECT(almost-equal(x, 1.29503028291737))
+  var p = pdf(G, 0.5)
+  #EXPECT(almost-equal(p, 0.778800783071405))
+  var cP = cdf-P(G, 0.5)
+  #EXPECT(almost-equal(cP, 0.221199216928595) )
+  var cQ = cdf-Q(G, 0.5)
+  #EXPECT(almost-equal(cQ, 0.778800783071405))
