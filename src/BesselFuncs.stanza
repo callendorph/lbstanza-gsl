@@ -1,0 +1,224 @@
+defpackage gsl/BesselFuncs :
+  import core
+  import gsl/Errors
+
+extern gsl_sf_bessel_J0 : (double) -> double
+extern gsl_sf_bessel_J1 : (double) -> double
+extern gsl_sf_bessel_Jn : (int, double) -> double
+extern gsl_sf_bessel_Y0 : (double) -> double
+extern gsl_sf_bessel_Y1 : (double) -> double
+extern gsl_sf_bessel_Yn : (int,double) -> double
+extern gsl_sf_bessel_I0 : (double) -> double
+extern gsl_sf_bessel_I1 : (double) -> double
+extern gsl_sf_bessel_In : (int, double) -> double
+extern gsl_sf_bessel_I0_scaled : (double) -> double
+extern gsl_sf_bessel_I1_scaled : (double) -> double
+extern gsl_sf_bessel_In_scaled : (int, double) -> double
+extern gsl_sf_bessel_K0 : (double) -> double
+extern gsl_sf_bessel_K1 : (double) -> double
+extern gsl_sf_bessel_Kn : (int, double) -> double
+extern gsl_sf_bessel_K0_scaled : (double) -> double
+extern gsl_sf_bessel_K1_scaled : (double) -> double
+extern gsl_sf_bessel_Kn_scaled : (int, double) -> double
+extern gsl_sf_bessel_j0 : (double) -> double
+extern gsl_sf_bessel_j1 : (double) -> double
+extern gsl_sf_bessel_j2 : (double) -> double
+extern gsl_sf_bessel_jl : (int, double) -> double
+extern gsl_sf_bessel_y0 : (double) -> double
+extern gsl_sf_bessel_y1 : (double) -> double
+extern gsl_sf_bessel_y2 : (double) -> double
+extern gsl_sf_bessel_yl : (int, double) -> double
+extern gsl_sf_bessel_i0_scaled : (double) -> double
+extern gsl_sf_bessel_i1_scaled : (double) -> double
+extern gsl_sf_bessel_i2_scaled : (double) -> double
+extern gsl_sf_bessel_il_scaled : (int, double) -> double
+extern gsl_sf_bessel_k0_scaled : (double) -> double
+extern gsl_sf_bessel_k1_scaled : (double) -> double
+extern gsl_sf_bessel_k2_scaled : (double) -> double
+extern gsl_sf_bessel_kl_scaled : (int, double) -> double
+extern gsl_sf_bessel_Jnu : (double, double) -> double
+extern gsl_sf_bessel_Ynu : (double, double) -> double
+extern gsl_sf_bessel_Inu_scaled : (double, double) -> double
+extern gsl_sf_bessel_Inu : (double, double) -> double
+extern gsl_sf_bessel_Knu_scaled : (double, double) -> double
+extern gsl_sf_bessel_Knu : (double, double) -> double
+extern gsl_sf_bessel_lnKnu : (double, double) -> double
+extern gsl_sf_bessel_zero_J0 : (int) -> double
+extern gsl_sf_bessel_zero_J1 : (int) -> double
+extern gsl_sf_bessel_zero_Jnu : (double, int) -> double
+
+public lostanza defn gsl_sf_bessel_J0 (x:ref<Double>) -> ref<Double> :
+  val ret = call-c gsl_sf_bessel_J0(x.value)
+  return new Double{ret}
+
+public lostanza defn gsl_sf_bessel_J1 (x:ref<Double>) -> ref<Double> :
+  val ret = call-c gsl_sf_bessel_J1(x.value)
+  return new Double{ret}
+
+public lostanza defn gsl_sf_bessel_Jn (n:ref<Int>, x:ref<Double>) -> ref<Double> :
+  val ret = call-c gsl_sf_bessel_Jn(n.value, x.value)
+  return new Double{ret}
+
+public lostanza defn gsl_sf_bessel_Y0 (x:ref<Double>) -> ref<Double> :
+  val ret = call-c gsl_sf_bessel_Y0(x.value)
+  return new Double{ret}
+
+public lostanza defn gsl_sf_bessel_Y1 (x:ref<Double>) -> ref<Double> :
+  val ret = call-c gsl_sf_bessel_Y1(x.value)
+  return new Double{ret}
+
+public lostanza defn gsl_sf_bessel_Yn (n:ref<Int>, x:ref<Double>) -> ref<Double> :
+  val ret = call-c gsl_sf_bessel_Yn(n.value, x.value)
+  return new Double{ret}
+
+public lostanza defn gsl_sf_bessel_I0 (x:ref<Double>) -> ref<Double> :
+  val ret = call-c gsl_sf_bessel_I0(x.value)
+  return new Double{ret}
+
+public lostanza defn gsl_sf_bessel_I1 (x:ref<Double>) -> ref<Double> :
+  val ret = call-c gsl_sf_bessel_I1(x.value)
+  return new Double{ret}
+
+public lostanza defn gsl_sf_bessel_In (n:ref<Int>, x:ref<Double>) -> ref<Double> :
+  val ret = call-c gsl_sf_bessel_In(n.value, x.value)
+  return new Double{ret}
+
+public lostanza defn gsl_sf_bessel_I0_scaled (x:ref<Double>) -> ref<Double> :
+  val ret = call-c gsl_sf_bessel_I0_scaled(x.value)
+  return new Double{ret}
+
+public lostanza defn gsl_sf_bessel_I1_scaled (x:ref<Double>) -> ref<Double> :
+  val ret = call-c gsl_sf_bessel_I1_scaled(x.value)
+  return new Double{ret}
+
+public lostanza defn gsl_sf_bessel_In_scaled (n:ref<Int>, x:ref<Double>) -> ref<Double> :
+  val ret = call-c gsl_sf_bessel_In_scaled(n.value, x.value)
+  return new Double{ret}
+
+public lostanza defn gsl_sf_bessel_K0 (x:ref<Double>) -> ref<Double> :
+  val ret = call-c gsl_sf_bessel_K0(x.value)
+  return new Double{ret}
+
+public lostanza defn gsl_sf_bessel_K1 (x:ref<Double>) -> ref<Double> :
+  val ret = call-c gsl_sf_bessel_K1(x.value)
+  return new Double{ret}
+
+public lostanza defn gsl_sf_bessel_Kn (n:ref<Int>, x:ref<Double>) -> ref<Double> :
+  val ret = call-c gsl_sf_bessel_Kn(n.value, x.value)
+  return new Double{ret}
+
+public lostanza defn gsl_sf_bessel_K0_scaled (x:ref<Double>) -> ref<Double> :
+  val ret = call-c gsl_sf_bessel_K0_scaled(x.value)
+  return new Double{ret}
+
+public lostanza defn gsl_sf_bessel_K1_scaled (x:ref<Double>) -> ref<Double> :
+  val ret = call-c gsl_sf_bessel_K1_scaled(x.value)
+  return new Double{ret}
+
+public lostanza defn gsl_sf_bessel_Kn_scaled (n:ref<Int>, x:ref<Double>) -> ref<Double> :
+  val ret = call-c gsl_sf_bessel_Kn_scaled(n.value, x.value)
+  return new Double{ret}
+
+public lostanza defn gsl_sf_bessel_j0 (x:ref<Double>) -> ref<Double> :
+  val ret = call-c gsl_sf_bessel_j0(x.value)
+  return new Double{ret}
+
+public lostanza defn gsl_sf_bessel_j1 (x:ref<Double>) -> ref<Double> :
+  val ret = call-c gsl_sf_bessel_j1(x.value)
+  return new Double{ret}
+
+public lostanza defn gsl_sf_bessel_j2 (x:ref<Double>) -> ref<Double> :
+  val ret = call-c gsl_sf_bessel_j2(x.value)
+  return new Double{ret}
+
+public lostanza defn gsl_sf_bessel_jl (n:ref<Int>, x:ref<Double>) -> ref<Double> :
+  val ret = call-c gsl_sf_bessel_jl(n.value, x.value)
+  return new Double{ret}
+
+public lostanza defn gsl_sf_bessel_y0 (x:ref<Double>) -> ref<Double> :
+  val ret = call-c gsl_sf_bessel_y0(x.value)
+  return new Double{ret}
+
+public lostanza defn gsl_sf_bessel_y1 (x:ref<Double>) -> ref<Double> :
+  val ret = call-c gsl_sf_bessel_y1(x.value)
+  return new Double{ret}
+
+public lostanza defn gsl_sf_bessel_y2 (x:ref<Double>) -> ref<Double> :
+  val ret = call-c gsl_sf_bessel_y2(x.value)
+  return new Double{ret}
+
+public lostanza defn gsl_sf_bessel_yl (n:ref<Int>, x:ref<Double>) -> ref<Double> :
+  val ret = call-c gsl_sf_bessel_yl(n.value, x.value)
+  return new Double{ret}
+
+public lostanza defn gsl_sf_bessel_i0_scaled (x:ref<Double>) -> ref<Double> :
+  val ret = call-c gsl_sf_bessel_i0_scaled(x.value)
+  return new Double{ret}
+
+public lostanza defn gsl_sf_bessel_i1_scaled (x:ref<Double>) -> ref<Double> :
+  val ret = call-c gsl_sf_bessel_i1_scaled(x.value)
+  return new Double{ret}
+
+public lostanza defn gsl_sf_bessel_i2_scaled (x:ref<Double>) -> ref<Double> :
+  val ret = call-c gsl_sf_bessel_i2_scaled(x.value)
+  return new Double{ret}
+
+public lostanza defn gsl_sf_bessel_il_scaled (n:ref<Int>, x:ref<Double>) -> ref<Double> :
+  val ret = call-c gsl_sf_bessel_il_scaled(n.value, x.value)
+  return new Double{ret}
+
+public lostanza defn gsl_sf_bessel_k0_scaled (x:ref<Double>) -> ref<Double> :
+  val ret = call-c gsl_sf_bessel_k0_scaled(x.value)
+  return new Double{ret}
+
+public lostanza defn gsl_sf_bessel_k1_scaled (x:ref<Double>) -> ref<Double> :
+  val ret = call-c gsl_sf_bessel_k1_scaled(x.value)
+  return new Double{ret}
+
+public lostanza defn gsl_sf_bessel_k2_scaled (x:ref<Double>) -> ref<Double> :
+  val ret = call-c gsl_sf_bessel_k2_scaled(x.value)
+  return new Double{ret}
+
+public lostanza defn gsl_sf_bessel_kl_scaled (n:ref<Int>, x:ref<Double>) -> ref<Double> :
+  val ret = call-c gsl_sf_bessel_kl_scaled(n.value, x.value)
+  return new Double{ret}
+
+public lostanza defn gsl_sf_bessel_Jnu (nu:ref<Double>, x:ref<Double>) -> ref<Double> :
+  val ret = call-c gsl_sf_bessel_Jnu(nu.value, x.value)
+  return new Double{ret}
+
+public lostanza defn gsl_sf_bessel_Ynu (nu:ref<Double>, x:ref<Double>) -> ref<Double> :
+  val ret = call-c gsl_sf_bessel_Ynu(nu.value, x.value)
+  return new Double{ret}
+
+public lostanza defn gsl_sf_bessel_Inu_scaled (nu:ref<Double>, x:ref<Double>) -> ref<Double> :
+  val ret = call-c gsl_sf_bessel_Inu_scaled(nu.value, x.value)
+  return new Double{ret}
+
+public lostanza defn gsl_sf_bessel_Inu (nu:ref<Double>, x:ref<Double>) -> ref<Double> :
+  val ret = call-c gsl_sf_bessel_Inu(nu.value, x.value)
+  return new Double{ret}
+
+public lostanza defn gsl_sf_bessel_Knu_scaled (nu:ref<Double>, x:ref<Double>) -> ref<Double> :
+  val ret = call-c gsl_sf_bessel_Knu_scaled(nu.value, x.value)
+  return new Double{ret}
+
+public lostanza defn gsl_sf_bessel_Knu (nu:ref<Double>, x:ref<Double>) -> ref<Double> :
+  val ret = call-c gsl_sf_bessel_Knu(nu.value, x.value)
+  return new Double{ret}
+
+public lostanza defn gsl_sf_bessel_lnKnu (nu:ref<Double>, x:ref<Double>) -> ref<Double> :
+  val ret = call-c gsl_sf_bessel_lnKnu(nu.value, x.value)
+  return new Double{ret}
+
+public lostanza defn gsl_sf_bessel_zero_J0 (n:ref<Int>) -> ref<Double> :
+  val ret = call-c gsl_sf_bessel_zero_J0(n.value)
+  return new Double{ret}
+
+public lostanza defn gsl_sf_bessel_zero_J1 (n:ref<Int>) -> ref<Double> :
+  val ret = call-c gsl_sf_bessel_zero_J1(n.value)
+  return new Double{ret}
+
+public lostanza defn gsl_sf_bessel_zero_Jnu (x:ref<Double>, n:ref<Int>) -> ref<Double> :
+  val ret = call-c gsl_sf_bessel_zero_Jnu(x.value, n.value)
+  return new Double{ret}
