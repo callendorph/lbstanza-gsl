@@ -30,6 +30,9 @@ extern gsl_vector_max_index : (ptr<?>) -> int
 extern gsl_vector_min_index : (ptr<?>) -> int
 extern gsl_vector_minmax_index : (ptr<?>, ptr<int>, ptr<int>) -> int
 
+extern gsl_vector_ptr : (ptr<?>, int) -> ptr<?>
+extern gsl_vector_get_stride : (ptr<?>) -> int
+
 lostanza deftype GVectorFinalizer <: Finalizer :
   value:ptr<?>
 
@@ -60,6 +63,18 @@ public lostanza defn GVector (other:ref<GVector>) -> ref<GVector> :
 
 public lostanza defmethod length (self:ref<GVector>) -> ref<Int> :
   return new Int{self.size}
+
+public lostanza defn stride (self:ref<GVector>) -> ref<Int> :
+  val ret = call-c gsl_vector_get_stride(self.value)
+  return new Int{ret}
+
+public lostanza defn get-ptr (self:ref<GVector>) -> ptr<?> :
+  val ret = call-c gsl_vector_ptr(self.value, 0)
+  return ret
+
+public lostanza defn get-ptr (self:ref<GVector>, i:int) -> ptr<?> :
+  val ret = call-c gsl_vector_ptr(self.value, i)
+  return ret
 
 public defmethod write (o:OutputStream, x:GVector) -> False :
   val strs = Array<String>(length(x))
