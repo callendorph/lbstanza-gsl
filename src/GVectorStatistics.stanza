@@ -1,0 +1,346 @@
+defpackage gsl/GVectorStatistics :
+  import core
+  import gsl/GVector
+  import gsl/Errors
+
+extern gsl_stats_mean : (ptr<double>, int, int) -> double
+extern gsl_stats_variance : (ptr<double>, int, int) -> double
+extern gsl_stats_variance_m : (ptr<double>, int, int, double) -> double
+extern gsl_stats_sd : (ptr<double>, int, int) -> double
+extern gsl_stats_sd_m : (ptr<double>, int, int, double) -> double
+extern gsl_stats_tss : (ptr<double>, int, int) -> double
+extern gsl_stats_tss_m : (ptr<double>, int, int, double) -> double
+extern gsl_stats_variance_with_fixed_mean : (ptr<double>, int, int, double) -> double
+extern gsl_stats_sd_with_fixed_mean : (ptr<double>, int, int, double) -> double
+extern gsl_stats_absdev : (ptr<double>, int, int) -> double
+extern gsl_stats_absdev_m : (ptr<double>, int, int, double) -> double
+
+extern gsl_stats_skew : (ptr<double>, int, int) -> double
+extern gsl_stats_skew_m_sd : (ptr<double>, int, int, double, double) -> double
+extern gsl_stats_kurtosis : (ptr<double>, int, int) -> double
+extern gsl_stats_kurtosis_m_sd : (ptr<double>, int, int, double, double) -> double
+
+extern gsl_stats_lag1_autocorrelation : (ptr<double>, int, int) -> double
+extern gsl_stats_lag1_autocorrelation_m : (ptr<double>, int, int, double) -> double
+extern gsl_stats_covariance : (ptr<double>, int, ptr<double>, int, int) -> double
+extern gsl_stats_covariance_m : (ptr<double>, int, ptr<double>, int, int, double, double) -> double
+extern gsl_stats_correlation : (ptr<double>, int, ptr<double>, int, int) -> double
+extern gsl_stats_spearman : (ptr<double>, int, ptr<double>, int, int, ptr<double>) -> double
+
+extern gsl_stats_wmean : (ptr<double>, int, ptr<double>, int, int) -> double
+extern gsl_stats_wvariance : (ptr<double>, int, ptr<double>, int, int) -> double
+extern gsl_stats_wvariance_m : (ptr<double>, int, ptr<double>, int, int, double) -> double
+extern gsl_stats_wvariance_with_fixed_mean : (ptr<double>, int, ptr<double>, int, int, double) -> double
+extern gsl_stats_wsd : (ptr<double>, int, ptr<double>, int, int) -> double
+extern gsl_stats_wsd_m : (ptr<double>, int, ptr<double>, int, int, double) -> double
+extern gsl_stats_wsd_with_fixed_mean : (ptr<double>, int, ptr<double>, int, int, double) -> double
+extern gsl_stats_wtss : (ptr<double>, int, ptr<double>, int, int) -> double
+extern gsl_stats_wtss_m : (ptr<double>, int, ptr<double>, int, int, double) -> double
+extern gsl_stats_wabsdev : (ptr<double>, int, ptr<double>, int, int) -> double
+extern gsl_stats_wabsdev_m : (ptr<double>, int, ptr<double>, int, int, double) -> double
+extern gsl_stats_wskew : (ptr<double>, int, ptr<double>, int, int) -> double
+extern gsl_stats_wskew_m_sd : (ptr<double>, int, ptr<double>, int, int, double, double) -> double
+extern gsl_stats_wkurtosis : (ptr<double>, int, ptr<double>, int, int) -> double
+extern gsl_stats_wkurtosis_m_sd : (ptr<double>, int, ptr<double>, int, int, double, double) -> double
+
+; Sorts in place
+extern gsl_stats_median : (ptr<double>, int, int) -> double
+
+public lostanza defn mean (self:ref<GVector>) -> ref<Double> :
+  val p = get-ptr(self)
+  val ret = call-c gsl_stats_mean(p, stride(self).value, length(self).value)
+  return new Double{ret}
+
+public lostanza defn variance (self:ref<GVector>) -> ref<Double> :
+  val p = get-ptr(self)
+  val ret = call-c gsl_stats_variance(p, stride(self).value, length(self).value)
+  return new Double{ret}
+
+public lostanza defn variance (self:ref<GVector>, mean:ref<Double>) -> ref<Double> :
+  val p = get-ptr(self)
+  val ret = call-c gsl_stats_variance_m(p, stride(self).value, length(self).value, mean.value)
+  return new Double{ret}
+
+public lostanza defn variance-fixed-mean (self:ref<GVector>, mean:ref<Double>) -> ref<Double> :
+  val p = get-ptr(self)
+  val ret = call-c gsl_stats_variance_with_fixed_mean(p, stride(self).value, length(self).value, mean.value)
+  return new Double{ret}
+
+public lostanza defn stddev (self:ref<GVector>) -> ref<Double> :
+  val p = get-ptr(self)
+  val ret = call-c gsl_stats_sd(p, stride(self).value, length(self).value)
+  return new Double{ret}
+
+public lostanza defn stddev (self:ref<GVector>, mean:ref<Double>) -> ref<Double> :
+  val p = get-ptr(self)
+  val ret = call-c gsl_stats_sd_m(p, stride(self).value, length(self).value, mean.value)
+  return new Double{ret}
+
+public lostanza defn stddev-fixed-mean (self:ref<GVector>, mean:ref<Double>) -> ref<Double> :
+  val p = get-ptr(self)
+  val ret = call-c gsl_stats_sd_with_fixed_mean(p, stride(self).value, length(self).value, mean.value)
+  return new Double{ret}
+
+public lostanza defn tss (self:ref<GVector>) -> ref<Double> :
+  val p = get-ptr(self)
+  val ret = call-c gsl_stats_tss(p, stride(self).value, length(self).value)
+  return new Double{ret}
+
+public lostanza defn tss (self:ref<GVector>, mean:ref<Double>) -> ref<Double> :
+  val p = get-ptr(self)
+  val ret = call-c gsl_stats_tss_m(p, stride(self).value, length(self).value, mean.value)
+  return new Double{ret}
+
+public lostanza defn absdev (self:ref<GVector>) -> ref<Double> :
+  val p = get-ptr(self)
+  val ret = call-c gsl_stats_absdev(p, stride(self).value, length(self).value)
+  return new Double{ret}
+
+public lostanza defn absdev (self:ref<GVector>, mean:ref<Double>) -> ref<Double> :
+  val p = get-ptr(self)
+  val ret = call-c gsl_stats_absdev_m(p, stride(self).value, length(self).value, mean.value)
+  return new Double{ret}
+
+public lostanza defn skew (self:ref<GVector>) -> ref<Double> :
+  val p = get-ptr(self)
+  val ret = call-c gsl_stats_skew(p, stride(self).value, length(self).value)
+  return new Double{ret}
+
+public lostanza defn skew (self:ref<GVector>, mean:ref<Double>, sd:ref<Double>) -> ref<Double> :
+  val p = get-ptr(self)
+  val ret = call-c gsl_stats_skew_m_sd(p, stride(self).value, length(self).value, mean.value, sd.value)
+  return new Double{ret}
+
+public lostanza defn kurtosis (self:ref<GVector>) -> ref<Double> :
+  val p = get-ptr(self)
+  val ret = call-c gsl_stats_kurtosis(p, stride(self).value, length(self).value)
+  return new Double{ret}
+
+public lostanza defn kurtosis (self:ref<GVector>, mean:ref<Double>, sd:ref<Double>) -> ref<Double> :
+  val p = get-ptr(self)
+  val ret = call-c gsl_stats_kurtosis_m_sd(p, stride(self).value, length(self).value, mean.value, sd.value)
+  return new Double{ret}
+
+public lostanza defn autocorrelation (self:ref<GVector>) -> ref<Double> :
+  val p = get-ptr(self)
+  val ret = call-c gsl_stats_lag1_autocorrelation(p, stride(self).value, length(self).value)
+  return new Double{ret}
+
+public lostanza defn autocorrelation (self:ref<GVector>, mean:ref<Double>) -> ref<Double> :
+  val p = get-ptr(self)
+  val ret = call-c gsl_stats_lag1_autocorrelation_m(p, stride(self).value, length(self).value, mean.value)
+  return new Double{ret}
+
+public lostanza defn covariance (self:ref<GVector>, other:ref<GVector>) -> ref<Double> :
+  val N = length(self).value
+  if N != length(other).value :
+    throw(GSLException(gsl-EINVAL()))
+  val p = get-ptr(self)
+  val o = get-ptr(self)
+  val ret = call-c gsl_stats_covariance(p, stride(self).value, o, stride(other).value, N)
+  return new Double{ret}
+
+public lostanza defn covariance (self:ref<GVector>, other:ref<GVector>, sMean:ref<Double>, oMean:ref<Double>) -> ref<Double> :
+  val N = length(self).value
+  if N != length(other).value :
+    throw(GSLException(gsl-EINVAL()))
+  val p = get-ptr(self)
+  val o = get-ptr(other)
+  val ret = call-c gsl_stats_covariance_m(p, stride(self).value, o, stride(other).value, N, sMean.value, oMean.value)
+  return new Double{ret}
+
+public lostanza defn correlation (self:ref<GVector>, other:ref<GVector>) -> ref<Double> :
+  val N = length(self).value
+  if N != length(other).value :
+    throw(GSLException(gsl-EINVAL()))
+  val p = get-ptr(self)
+  val o = get-ptr(self)
+  val ret = call-c gsl_stats_correlation(p, stride(self).value, o, stride(other).value, N)
+  return new Double{ret}
+
+
+public lostanza defn spearman (self:ref<GVector>, other:ref<GVector>) -> ref<Double> :
+  val N = length(self).value
+  if N != length(other).value :
+    throw(GSLException(gsl-EINVAL()))
+
+  val work = call-c clib/malloc(2 * N * sizeof(double))
+  if work == null :
+    throw(GSLException(gsl-ENOMEM()))
+
+  val p = get-ptr(self)
+  val o = get-ptr(self)
+  val ret = call-c gsl_stats_spearman(p, stride(self).value, o, stride(other).value, N, work)
+  call-c clib/free(work)
+  return new Double{ret}
+
+public lostanza defn weighted-mean (self:ref<GVector>, weights:ref<GVector>) -> ref<Double> :
+  val N = length(self).value
+  if N != length(weights).value :
+    throw(GSLException(gsl-EINVAL()))
+
+  val w = get-ptr(weights)
+  val p = get-ptr(self)
+
+  val ret = call-c gsl_stats_wmean(w, stride(weights).value, p, stride(self).value, N)
+  return new Double{ret}
+
+public lostanza defn weighted-variance (self:ref<GVector>, weights:ref<GVector>) -> ref<Double> :
+  val N = length(self).value
+  if N != length(weights).value :
+    throw(GSLException(gsl-EINVAL()))
+
+  val w = get-ptr(weights)
+  val p = get-ptr(self)
+
+  val ret = call-c gsl_stats_wvariance(w, stride(weights).value, p, stride(self).value, N)
+  return new Double{ret}
+
+public lostanza defn weighted-variance (self:ref<GVector>, weights:ref<GVector>, mean:ref<Double>) -> ref<Double> :
+  val N = length(self).value
+  if N != length(weights).value :
+    throw(GSLException(gsl-EINVAL()))
+
+  val w = get-ptr(weights)
+  val p = get-ptr(self)
+
+  val ret = call-c gsl_stats_wvariance_m(w, stride(weights).value, p, stride(self).value, N, mean.value)
+  return new Double{ret}
+
+public lostanza defn weighted-variance-fixed-mean (self:ref<GVector>, weights:ref<GVector>, mean:ref<Double>) -> ref<Double> :
+  val N = length(self).value
+  if N != length(weights).value :
+    throw(GSLException(gsl-EINVAL()))
+
+  val w = get-ptr(weights)
+  val p = get-ptr(self)
+
+  val ret = call-c gsl_stats_wvariance_with_fixed_mean(w, stride(weights).value, p, stride(self).value, N, mean.value)
+  return new Double{ret}
+
+public lostanza defn weighted-stddev (self:ref<GVector>, weights:ref<GVector>) -> ref<Double> :
+  val N = length(self).value
+  if N != length(weights).value :
+    throw(GSLException(gsl-EINVAL()))
+
+  val w = get-ptr(weights)
+  val p = get-ptr(self)
+
+  val ret = call-c gsl_stats_wsd(w, stride(weights).value, p, stride(self).value, N)
+  return new Double{ret}
+
+public lostanza defn weighted-stddev (self:ref<GVector>, weights:ref<GVector>, mean:ref<Double>) -> ref<Double> :
+  val N = length(self).value
+  if N != length(weights).value :
+    throw(GSLException(gsl-EINVAL()))
+
+  val w = get-ptr(weights)
+  val p = get-ptr(self)
+
+  val ret = call-c gsl_stats_wsd_m(w, stride(weights).value, p, stride(self).value, N, mean.value)
+  return new Double{ret}
+
+public lostanza defn weighted-stddev-fixed-mean (self:ref<GVector>, weights:ref<GVector>, mean:ref<Double>) -> ref<Double> :
+  val N = length(self).value
+  if N != length(weights).value :
+    throw(GSLException(gsl-EINVAL()))
+
+  val w = get-ptr(weights)
+  val p = get-ptr(self)
+
+  val ret = call-c gsl_stats_wsd_with_fixed_mean(w, stride(weights).value, p, stride(self).value, N, mean.value)
+  return new Double{ret}
+
+
+public lostanza defn weighted-tss (self:ref<GVector>, weights:ref<GVector>) -> ref<Double> :
+  val N = length(self).value
+  if N != length(weights).value :
+    throw(GSLException(gsl-EINVAL()))
+
+  val w = get-ptr(weights)
+  val p = get-ptr(self)
+
+  val ret = call-c gsl_stats_wtss(w, stride(weights).value, p, stride(self).value, N)
+  return new Double{ret}
+
+public lostanza defn weighted-tss (self:ref<GVector>, weights:ref<GVector>, mean:ref<Double>) -> ref<Double> :
+  val N = length(self).value
+  if N != length(weights).value :
+    throw(GSLException(gsl-EINVAL()))
+
+  val w = get-ptr(weights)
+  val p = get-ptr(self)
+
+  val ret = call-c gsl_stats_wtss_m(w, stride(weights).value, p, stride(self).value, N, mean.value)
+  return new Double{ret}
+
+public lostanza defn weighted-absdev (self:ref<GVector>, weights:ref<GVector>) -> ref<Double> :
+  val N = length(self).value
+  if N != length(weights).value :
+    throw(GSLException(gsl-EINVAL()))
+
+  val w = get-ptr(weights)
+  val p = get-ptr(self)
+
+  val ret = call-c gsl_stats_wabsdev(w, stride(weights).value, p, stride(self).value, N)
+  return new Double{ret}
+
+public lostanza defn weighted-absdev (self:ref<GVector>, weights:ref<GVector>, mean:ref<Double>) -> ref<Double> :
+  val N = length(self).value
+  if N != length(weights).value :
+    throw(GSLException(gsl-EINVAL()))
+
+  val w = get-ptr(weights)
+  val p = get-ptr(self)
+
+  val ret = call-c gsl_stats_wabsdev_m(w, stride(weights).value, p, stride(self).value, N, mean.value)
+  return new Double{ret}
+
+public lostanza defn weighted-skew (self:ref<GVector>, weights:ref<GVector>) -> ref<Double> :
+  val N = length(self).value
+  if N != length(weights).value :
+    throw(GSLException(gsl-EINVAL()))
+
+  val w = get-ptr(weights)
+  val p = get-ptr(self)
+
+  val ret = call-c gsl_stats_wskew(w, stride(weights).value, p, stride(self).value, N)
+  return new Double{ret}
+
+public lostanza defn weighted-skew (self:ref<GVector>, weights:ref<GVector>, mean:ref<Double>, sd:ref<Double>) -> ref<Double> :
+  val N = length(self).value
+  if N != length(weights).value :
+    throw(GSLException(gsl-EINVAL()))
+
+  val w = get-ptr(weights)
+  val p = get-ptr(self)
+
+  val ret = call-c gsl_stats_wskew_m_sd(w, stride(weights).value, p, stride(self).value, N, mean.value, sd.value)
+  return new Double{ret}
+
+public lostanza defn weighted-kurtosis (self:ref<GVector>, weights:ref<GVector>) -> ref<Double> :
+  val N = length(self).value
+  if N != length(weights).value :
+    throw(GSLException(gsl-EINVAL()))
+
+  val w = get-ptr(weights)
+  val p = get-ptr(self)
+
+  val ret = call-c gsl_stats_wkurtosis(w, stride(weights).value, p, stride(self).value, N)
+  return new Double{ret}
+
+public lostanza defn weighted-kurtosis (self:ref<GVector>, weights:ref<GVector>, mean:ref<Double>, sd:ref<Double>) -> ref<Double> :
+  val N = length(self).value
+  if N != length(weights).value :
+    throw(GSLException(gsl-EINVAL()))
+
+  val w = get-ptr(weights)
+  val p = get-ptr(self)
+
+  val ret = call-c gsl_stats_wkurtosis_m_sd(w, stride(weights).value, p, stride(self).value, N, mean.value, sd.value)
+  return new Double{ret}
+
+public lostanza defn median (self:ref<GVector>) -> ref<Double> :
+  val p = get-ptr(self)
+  val ret = call-c gsl_stats_median(p, stride(self).value, length(self).value)
+  return new Double{ret}

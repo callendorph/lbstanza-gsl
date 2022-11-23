@@ -22,6 +22,14 @@ package gsl/GVector requires :
   ccflags :
     "-I{GSL_INCDIR}"
 
+package gsl/GVectorStatistics requires :
+  ccfiles:
+    "src/GVector.c"
+    "{GSL_LIBDIR}/libgsl.a"
+    "{GSL_LIBDIR}/libgslcblas.a"
+  ccflags :
+    "-I{GSL_INCDIR}"
+
 package gsl/GComplex requires :
   ccfiles:
     "src/GComplex.c"
@@ -67,6 +75,7 @@ build main :
     gsl/Errors
     gsl/ElementaryFuncs
     gsl/GVector
+    gsl/GVectorStatistics
     gsl/GComplex
     gsl/GMatrix
     gsl/GRng
@@ -78,6 +87,7 @@ build-test gsl-tests :
   inputs:
     gsl/tests/ElementaryFuncs
     gsl/tests/GVector
+    gsl/tests/GVectorStatistics
     gsl/tests/GComplex
     gsl/tests/Errors
     gsl/tests/GMatrix

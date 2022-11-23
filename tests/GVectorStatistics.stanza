@@ -1,0 +1,146 @@
+#use-added-syntax(tests)
+defpackage gsl/tests/GVectorStatistics :
+  import core
+  import gsl/GVector
+  import gsl/GVectorStatistics
+
+val epsilon = 1.0e-6
+#if-defined(TESTING) :
+  defn almost-equal (obs, exp) -> True|False :
+    abs(obs - exp) < epsilon
+
+
+deftest(gvector-stats) gsl-gvector-basic-stats :
+  val uut = GVector(10)
+  for i in 0 to length(uut) do :
+    uut[i] = to-double(i)
+
+  var ret = mean(uut)
+  #EXPECT(ret == 4.5)
+
+  ret = variance(uut)
+  #EXPECT(almost-equal(ret, 9.1666667))
+
+  ret = variance(uut, 4.5)
+  #EXPECT(almost-equal(ret, 9.1666667))
+
+  ret = variance-fixed-mean(uut, 4.5)
+  #EXPECT(almost-equal(ret, 8.25))
+
+  ret = stddev(uut)
+  #EXPECT(almost-equal(ret, 3.02765))
+
+  ret = stddev(uut, 4.5)
+  #EXPECT(almost-equal(ret, 3.02765))
+
+  ret = stddev-fixed-mean(uut, 4.5)
+  #EXPECT(almost-equal(ret, 2.872281))
+
+  ret = tss(uut)
+  #EXPECT(almost-equal(ret, 82.5))
+
+  ret = tss(uut, 4.5)
+  #EXPECT(almost-equal(ret, 82.5))
+
+  ret = absdev(uut)
+  #EXPECT(almost-equal(ret, 2.5))
+
+  ret = absdev(uut, 4.5)
+  #EXPECT(almost-equal(ret, 2.5))
+
+  ret = skew(uut)
+  #EXPECT(almost-equal(ret, -1.11e-16))
+
+  ret = skew(uut, 4.5, 3.02)
+  #EXPECT(almost-equal(ret, 0.0))
+
+  ret = kurtosis(uut)
+  #EXPECT(almost-equal(ret, -1.561636))
+
+  ret = kurtosis(uut, 4.5, 3.02)
+  #EXPECT(almost-equal(ret, -1.547006065))
+
+  ret = median(uut)
+  #EXPECT(almost-equal(ret, 4.5))
+
+deftest(gvector-stats) gsl-gvector-adv-stats :
+
+  val uut = GVector(10)
+  for i in 0 to length(uut) do :
+    uut[i] = to-double(i)
+
+  var ret = autocorrelation(uut)
+  #EXPECT(ret == 0.7)
+
+  ret = autocorrelation(uut, 4.5)
+  #EXPECT(ret == 0.7)
+
+  val other = GVector(10)
+  for i in 0 to length(uut) do :
+    other[i] = 10.0 - to-double(i)
+
+  ret = covariance(uut, other)
+  #EXPECT(almost-equal(ret, 9.166666666))
+
+  ret = covariance(uut, other, 4.5, 5.5)
+  #EXPECT(almost-equal(ret, -9.16666666))
+
+  ret = correlation(uut, other)
+  #EXPECT(ret == 1.0)
+
+  ret = spearman(uut, other)
+  #EXPECT(ret == 1.0)
+
+deftest(gvector-stats) gsl-gvector-weighted-stats :
+  val uut = GVector(10)
+  for i in 0 to length(uut) do :
+    uut[i] = to-double(i)
+
+  val weights = GVector(10)
+  for i in 0 to length(weights) do :
+    weights[i] = to-double(i)/10.0
+
+  var ret = weighted-mean(uut, weights)
+  #EXPECT(almost-equal(ret, 6.33333333))
+
+  ret = weighted-variance(uut, weights)
+  #EXPECT(almost-equal(ret, 5.6896551))
+
+  ret = weighted-variance(uut, weights, 4.5)
+  #EXPECT(almost-equal(ret, 9.601293))
+
+  ret = weighted-variance-fixed-mean(uut, weights, 4.5)
+  #EXPECT(almost-equal(ret, 8.25))
+
+  ret = weighted-stddev(uut, weights)
+  #EXPECT(almost-equal(ret, 2.3852998))
+
+  ret = weighted-stddev(uut, weights, 4.5)
+  #EXPECT(almost-equal(ret, 3.0985953))
+
+  ret = weighted-stddev-fixed-mean(uut, weights, 4.5)
+  #EXPECT(almost-equal(ret, 2.8722813))
+
+  ret = weighted-tss(uut, weights)
+  #EXPECT(almost-equal(ret, 22.0))
+
+  ret = weighted-tss(uut, weights, 4.5)
+  #EXPECT(almost-equal(ret, 37.125))
+
+  ret = weighted-absdev(uut, weights)
+  #EXPECT(almost-equal(ret, 1.866666))
+
+  ret = weighted-absdev(uut, weights, 4.5)
+  #EXPECT(almost-equal(ret, 2.5))
+
+  ret = weighted-skew(uut, weights)
+  #EXPECT(almost-equal(ret, -0.4562928))
+
+  ret = weighted-skew(uut, weights, 4.5, 2.0)
+  #EXPECT(almost-equal(ret, 3.357292))
+
+  ret = weighted-kurtosis(uut, weights)
+  #EXPECT(almost-equal(ret, -1.25822))
+
+  ret = weighted-kurtosis(uut, weights, 4.5, 2.0)
+  #EXPECT(almost-equal(ret, 4.553906))
