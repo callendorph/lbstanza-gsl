@@ -12,6 +12,9 @@ public lostanza defn gsl-ENOMEM () -> ref<Int> :
   ;  lostanza reference an enum value defined in a header.
   return new Int{8}
 
+public lostanza defn gsl-EINVAL () -> ref<Int> :
+  return new Int{4}
+
 public defstruct GSLException <: Exception :
   code:Int
 
