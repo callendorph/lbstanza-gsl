@@ -16,6 +16,7 @@ package gsl/ElementaryFuncs requires :
 
 package gsl/GVector requires :
   ccfiles:
+    "src/GVector.c"
     "{GSL_LIBDIR}/libgsl.a"
     "{GSL_LIBDIR}/libgslcblas.a"
   ccflags :
