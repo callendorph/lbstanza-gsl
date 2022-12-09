@@ -19,6 +19,10 @@ deftest(gcomplex) gsl-gcomplex-basic:
   #EXPECT(real(a) == 0.0)
   #EXPECT(imag(a) == 0.0)
 
+  a = GComplex(10.0)
+  #EXPECT(real(a) == 10.0)
+  #EXPECT(imag(a) == 0.0)
+
   a = GComplexPolar(1.0, 2.0)
   #EXPECT(almost-equal(real(a), -0.4161))
   #EXPECT(almost-equal(imag(a), 0.9093))

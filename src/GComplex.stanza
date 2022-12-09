@@ -80,10 +80,21 @@ extern w_gsl_complex_arccoth : (ptr<?>, ptr<?>) -> int
 public lostanza defn GComplex () -> ref<GComplex> :
   return new GComplex{0.0, 0.0}
 
-public lostanza defn GComplex (x:ref<Double>, y:ref<Double>) -> ref<GComplex> :
+public lostanza defn GComplex (x:double) -> ref<GComplex> :
   val ret = GComplex()
-  call-c w_gsl_complex_rect(addr!(ret.x), x.value, y.value)
+  call-c w_gsl_complex_rect(addr!(ret.x), x, 0.0)
   return ret
+
+public lostanza defn GComplex (x:ref<Double>) -> ref<GComplex> :
+  return GComplex(x.value)
+
+public lostanza defn GComplex (x:double, y:double) -> ref<GComplex> :
+  val ret = GComplex()
+  call-c w_gsl_complex_rect(addr!(ret.x), x, y)
+  return ret
+
+public lostanza defn GComplex (x:ref<Double>, y:ref<Double>) -> ref<GComplex> :
+  return GComplex(x.value, y.value)
 
 public lostanza defn GComplexPolar (r:ref<Double>, th:ref<Double>) -> ref<GComplex> :
   val ret = GComplex()
