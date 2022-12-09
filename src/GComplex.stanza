@@ -224,6 +224,23 @@ public defn divide (A:GComplex, B:Double) -> GComplex:
 public defn divide (B:Double, A:GComplex) -> GComplex:
   inverse(A) * B
 
+public defn equal? (A:GComplex, B:GComplex) -> True|False :
+  real(A) == real(B) and imag(A) == imag(B)
+
+public defn equal? (A:GComplex, B:Double) -> True|False :
+  real(A) == B and imag(A) == 0.0
+
+public defn equal? (B:Double, A:GComplex) -> True|False :
+  A == B
+
+public defn not-equal? (A:GComplex, B:GComplex) -> True|False :
+  real(A) != real(B) or imag(A) != imag(B)
+
+public defn not-equal? (A:GComplex, B:Double) -> True|False :
+  real(A) != B or imag(A) != 0.0
+
+public defn not-equal? (B:Double, A:GComplex) -> True|False :
+  A != B
 
 ; Elementary Functions
 
