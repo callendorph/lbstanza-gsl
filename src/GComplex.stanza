@@ -98,6 +98,11 @@ public lostanza defn imag (obj:ref<GComplex>) -> ref<Double> :
   val ret = call-c w_gsl_complex_imag(addr!(obj.x))
   return  new Double{ret}
 
+defmethod print (o:OutputStream, x:GComplex) :
+  val img = imag(x)
+  val join = "-" when img < 0.0 else "+"
+  print(o, "(%_%_%_i)" % [real(x), join, abs(img)])
+
 public lostanza defn arg (obj:ref<GComplex>) -> ref<Double> :
   val ret = call-c w_gsl_complex_arg(addr!(obj.x))
   return new Double{ret}
